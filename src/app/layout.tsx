@@ -4,6 +4,9 @@ import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
+import { api } from "~/trpc/server";
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 
 export const metadata: Metadata = {
   title: "CVRankify",
@@ -16,9 +19,18 @@ const geist = Geist({
   variable: "--font-geist-sans",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? "/";
+
+  const userCount = await api.setup.userCount();
+
+  if (userCount < 1 && pathname !== "/setup") {
+    redirect("/setup");
+  }
+
   return (
     <html lang="en" className={`${geist.variable}`}>
       <body>
