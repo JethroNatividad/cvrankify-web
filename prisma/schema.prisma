@@ -132,6 +132,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     jobs          Job[]
+    isAdmin       Boolean  @default(false)
 }
 
 model VerificationToken {
