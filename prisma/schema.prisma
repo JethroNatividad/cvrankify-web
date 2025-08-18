@@ -14,16 +14,84 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
+model Job {
     id        Int      @id @default(autoincrement())
-    name      String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+    title     String   @db.VarChar(255)
+    description String @db.Text
+    skills    String   @db.Text
+    yearsOfExperience Int      @db.TinyInt @default(0)
+    education String   @db.VarChar(100)
+    location  String   @db.VarChar(100)
+    timezone  String   @db.VarChar(100)
 
+    // Use DECIMAL for precise calculations
+    skillsWeight     Decimal @db.Decimal(3,2) @default(0.25)
+    experienceWeight Decimal @db.Decimal(3,2) @default(0.25)
+    educationWeight  Decimal @db.Decimal(3,2) @default(0.25)
+    locationWeight   Decimal @db.Decimal(3,2) @default(0.25)
+    
+    // Use smaller integer types for counters
+    interviewing     Int @db.TinyInt @default(0)
+    interviewsNeeded Int @db.TinyInt @default(1)
+    hires           Int @db.TinyInt @default(0)
+    hiresNeeded     Int @db.TinyInt @default(1)
+    
+    isOpen Boolean @default(true)
+    
     createdBy   User   @relation(fields: [createdById], references: [id])
     createdById String
 
-    @@index([name])
+    // Add composite indexes for common queries
+    @@index([isOpen, createdAt])
+    @@index([createdById, isOpen])
+    @@index([title])
+    @@index([location, isOpen])
+    
+    applicants  Applicant[]
+}
+
+model Applicant {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    name      String   @db.VarChar(255)
+    email     String   @db.VarChar(255)
+    resume    String   @db.Text
+    
+    // AI Processing Status
+    statusAI String @db.VarChar(50) @default("pending") // "pending", "processing", "completed", "failed"
+
+    // AI Scores - use DECIMAL for consistency with Job weights
+    skillsScoreAI     Decimal @db.Decimal(4,2) @default(0.00)
+    experienceScoreAI Decimal @db.Decimal(4,2) @default(0.00)
+    educationScoreAI  Decimal @db.Decimal(4,2) @default(0.00)
+    timezoneScoreAI   Decimal @db.Decimal(4,2) @default(0.00)
+    overallScoreAI    Decimal @db.Decimal(4,2) @default(0.00)
+
+    // AI Feedback - make nullable to save space when empty
+    skillsFeedbackAI     String? @db.Text
+    experienceFeedbackAI String? @db.Text
+    educationFeedbackAI  String? @db.Text
+    timezoneFeedbackAI   String? @db.Text
+    overallFeedbackAI    String? @db.Text
+
+    // Interview Tracking
+    currentStage    Int    @db.TinyInt @default(0) // 0 = application review, 1+ = interview rounds
+    interviewStatus String @db.VarChar(20) @default("pending") // "pending", "scheduled", "passed", "failed", "hired", "rejected"
+    interviewNotes  String? @db.Text
+
+    // Foreign Key
+    jobId Int
+    job   Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+    // Optimized indexes for common queries
+    @@index([jobId, interviewStatus]) // Filter by job and status
+    @@index([jobId, currentStage])    // Filter by job and stage
+    @@index([statusAI])               // Filter by AI processing status
+    @@index([overallScoreAI])         // Sort by score
+    @@index([email])                  // Prevent duplicates/lookup
 }
 
 // Necessary for Next auth
@@ -63,7 +131,7 @@ model User {
     password      String?
     accounts      Account[]
     sessions      Session[]
-    posts         Post[]
+    jobs          Job[]
 }
 
 model VerificationToken {
