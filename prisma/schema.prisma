@@ -22,7 +22,8 @@ model Job {
     description String @db.Text
     skills    String   @db.Text
     yearsOfExperience Int      @db.TinyInt @default(0)
-    education String   @db.VarChar(100)
+    educationDegree    String   @db.VarChar(100)
+    educationField     String?  @db.VarChar(100)
     location  String   @db.VarChar(100)
     timezone  String   @db.VarChar(100)
 

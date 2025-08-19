@@ -16,6 +16,13 @@ import {
 import { Input } from "~/app/_components/ui/input";
 import { Button } from "~/app/_components/ui/button";
 import { TagsInput } from "~/app/_components/ui/tags-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/app/_components/ui/select";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z
@@ -27,10 +34,11 @@ const formSchema = z
       .number()
       .min(0, "Years of experience must be 0 or greater")
       .max(50, "Years of experience seems too high"),
-    education: z
+    educationDegree: z.enum(["High School", "Bachelor", "Master", "PhD"]),
+    educationField: z
       .string()
-      .min(1, "Education requirement is required")
-      .max(100, "Education requirement is too long"),
+      .max(100, "Education field is too long")
+      .optional(),
     location: z
       .string()
       .min(1, "Location is required")
@@ -87,7 +95,8 @@ const CreateJobForm = () => {
       description: "",
       skills: [],
       yearsOfExperience: 0,
-      education: "",
+      educationDegree: undefined,
+      educationField: "",
       location: "",
       timezone: "",
       skillsWeight: 0.25,
@@ -194,21 +203,57 @@ const CreateJobForm = () => {
                 </FormItem>
               )}
             />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="educationDegree"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Education Degree</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select degree level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="High School">High School</SelectItem>
+                        <SelectItem value="Bachelor">
+                          Bachelor&apos;s Degree
+                        </SelectItem>
+                        <SelectItem value="Master">
+                          Master&apos;s Degree
+                        </SelectItem>
+                        <SelectItem value="PhD">PhD</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormDescription>
+                    Required minimum education level
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
-              name="education"
+              name="educationField"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Education Requirement</FormLabel>
+                  <FormLabel>Education Field</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="e.g. Bachelor's in Computer Science"
+                      placeholder="e.g. Computer Science, Engineering, etc."
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    Required educational background
+                    Required or preferred field of study (optional)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -416,7 +461,7 @@ const CreateJobForm = () => {
           </div>
         </div>
 
-        <Button type="submit" className="w-full" disabled={false}>
+        <Button type="submit" disabled={false}>
           Create Job Posting
           {false && <Loader2 className="ml-1 animate-spin" />}
         </Button>
