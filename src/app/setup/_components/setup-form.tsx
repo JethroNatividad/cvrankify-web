@@ -153,7 +153,11 @@ const SetupForm = () => {
           )}
         />
 
-        <Button type="submit" disabled={createUser.isPending}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={createUser.isPending}
+        >
           Create Account
           {createUser.isPending && <Loader2 className="ml-1 animate-spin" />}
         </Button>
