@@ -39,10 +39,6 @@ const formSchema = z
       .string()
       .max(100, "Education field is too long")
       .optional(),
-    location: z
-      .string()
-      .min(1, "Location is required")
-      .max(100, "Location is too long"),
     timezone: z
       .string()
       .min(1, "Timezone is required")
@@ -59,7 +55,7 @@ const formSchema = z
       .number()
       .min(0)
       .max(1, "Weight must be between 0 and 1"),
-    locationWeight: z.coerce
+    timezoneWeight: z.coerce
       .number()
       .min(0)
       .max(1, "Weight must be between 0 and 1"),
@@ -78,7 +74,7 @@ const formSchema = z
         data.skillsWeight +
         data.experienceWeight +
         data.educationWeight +
-        data.locationWeight;
+        data.timezoneWeight;
       return Math.abs(totalWeight - 1) < 0.01; // Allow for small floating point errors
     },
     {
@@ -97,12 +93,11 @@ const CreateJobForm = () => {
       yearsOfExperience: 0,
       educationDegree: undefined,
       educationField: "",
-      location: "",
       timezone: "",
-      skillsWeight: 0.25,
-      experienceWeight: 0.25,
-      educationWeight: 0.25,
-      locationWeight: 0.25,
+      skillsWeight: 0.4,
+      experienceWeight: 0.3,
+      educationWeight: 0.2,
+      timezoneWeight: 0.1,
       interviewsNeeded: 1,
       hiresNeeded: 1,
     },
@@ -203,6 +198,23 @@ const CreateJobForm = () => {
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="timezone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Timezone</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. EST, PST, GMT+1" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Required or preferred timezone
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -254,45 +266,6 @@ const CreateJobForm = () => {
                   </FormControl>
                   <FormDescription>
                     Required or preferred field of study (optional)
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g. New York, NY or Remote"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Job location or remote work arrangement
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="timezone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Timezone</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g. EST, PST, GMT+1" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    Required or preferred timezone
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -384,10 +357,10 @@ const CreateJobForm = () => {
 
             <FormField
               control={form.control}
-              name="locationWeight"
+              name="timezoneWeight"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Location Weight</FormLabel>
+                  <FormLabel>Timezone Weight</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -399,7 +372,7 @@ const CreateJobForm = () => {
                     />
                   </FormControl>
                   <FormDescription>
-                    Weight for location/timezone match (0-1)
+                    Weight for timezone match (0-1)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

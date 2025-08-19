@@ -24,14 +24,13 @@ model Job {
     yearsOfExperience Int      @db.TinyInt @default(0)
     educationDegree    String   @db.VarChar(100)
     educationField     String?  @db.VarChar(100)
-    location  String   @db.VarChar(100)
     timezone  String   @db.VarChar(100)
 
     // Use DECIMAL for precise calculations
     skillsWeight     Decimal @db.Decimal(3,2) @default(0.25)
     experienceWeight Decimal @db.Decimal(3,2) @default(0.25)
     educationWeight  Decimal @db.Decimal(3,2) @default(0.25)
-    locationWeight   Decimal @db.Decimal(3,2) @default(0.25)
+    timezoneWeight   Decimal @db.Decimal(3,2) @default(0.25)
     
     // Use smaller integer types for counters
     interviewing     Int @db.TinyInt @default(0)
@@ -48,7 +47,6 @@ model Job {
     @@index([isOpen, createdAt])
     @@index([createdById, isOpen])
     @@index([title])
-    @@index([location, isOpen])
     
     applicants  Applicant[]
 }
