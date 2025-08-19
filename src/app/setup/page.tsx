@@ -1,6 +1,14 @@
+import { api } from "~/trpc/server";
 import SetupForm from "./_components/setup-form";
+import { redirect } from "next/navigation";
 
-export default function SetupPage() {
+export default async function SetupPage() {
+  const userCount = await api.setup.userCount();
+
+  if (userCount > 0) {
+    redirect("/");
+  }
+
   return (
     <div className="container mx-auto max-w-md py-12">
       <div className="space-y-6">
