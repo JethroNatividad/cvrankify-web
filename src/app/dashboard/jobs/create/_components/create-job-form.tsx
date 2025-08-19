@@ -206,7 +206,88 @@ const CreateJobForm = () => {
                 <FormItem>
                   <FormLabel>Timezone</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. EST, PST, GMT+1" {...field} />
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select timezone" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="GMT-12">
+                          GMT-12 (Baker Island)
+                        </SelectItem>
+                        <SelectItem value="GMT-11">
+                          GMT-11 (American Samoa)
+                        </SelectItem>
+                        <SelectItem value="GMT-10">GMT-10 (Hawaii)</SelectItem>
+                        <SelectItem value="GMT-9">GMT-9 (Alaska)</SelectItem>
+                        <SelectItem value="GMT-8">
+                          GMT-8 (Pacific Time)
+                        </SelectItem>
+                        <SelectItem value="GMT-7">
+                          GMT-7 (Mountain Time)
+                        </SelectItem>
+                        <SelectItem value="GMT-6">
+                          GMT-6 (Central Time)
+                        </SelectItem>
+                        <SelectItem value="GMT-5">
+                          GMT-5 (Eastern Time)
+                        </SelectItem>
+                        <SelectItem value="GMT-4">
+                          GMT-4 (Atlantic Time)
+                        </SelectItem>
+                        <SelectItem value="GMT-3">
+                          GMT-3 (Argentina, Brazil)
+                        </SelectItem>
+                        <SelectItem value="GMT-2">
+                          GMT-2 (Mid-Atlantic)
+                        </SelectItem>
+                        <SelectItem value="GMT-1">GMT-1 (Azores)</SelectItem>
+                        <SelectItem value="GMT+0">
+                          GMT+0 (London, Dublin)
+                        </SelectItem>
+                        <SelectItem value="GMT+1">
+                          GMT+1 (Paris, Berlin)
+                        </SelectItem>
+                        <SelectItem value="GMT+2">
+                          GMT+2 (Cairo, Athens)
+                        </SelectItem>
+                        <SelectItem value="GMT+3">
+                          GMT+3 (Moscow, Istanbul)
+                        </SelectItem>
+                        <SelectItem value="GMT+4">
+                          GMT+4 (Dubai, Baku)
+                        </SelectItem>
+                        <SelectItem value="GMT+5">
+                          GMT+5 (Pakistan, Kazakhstan)
+                        </SelectItem>
+                        <SelectItem value="GMT+5:30">
+                          GMT+5:30 (India, Sri Lanka)
+                        </SelectItem>
+                        <SelectItem value="GMT+6">
+                          GMT+6 (Bangladesh, Kyrgyzstan)
+                        </SelectItem>
+                        <SelectItem value="GMT+7">
+                          GMT+7 (Thailand, Vietnam)
+                        </SelectItem>
+                        <SelectItem value="GMT+8">
+                          GMT+8 (China, Singapore)
+                        </SelectItem>
+                        <SelectItem value="GMT+9">
+                          GMT+9 (Japan, South Korea)
+                        </SelectItem>
+                        <SelectItem value="GMT+10">
+                          GMT+10 (Australia East)
+                        </SelectItem>
+                        <SelectItem value="GMT+11">
+                          GMT+11 (Solomon Islands)
+                        </SelectItem>
+                        <SelectItem value="GMT+12">
+                          GMT+12 (New Zealand)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormDescription>
                     Required or preferred timezone
