@@ -1,0 +1,48 @@
+"use client";
+
+import React from "react";
+import { Button } from "./ui/button";
+import { ChevronDown } from "lucide-react";
+import type { User } from "next-auth";
+import { signOut } from "next-auth/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+
+type Props = {
+  user: User;
+};
+
+const Navbar = ({ user }: Props) => {
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  return (
+    <nav className="flex justify-between border-b px-8 py-4">
+      <h1 className="text-2xl font-bold">CVRankify</h1>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="flex items-center">
+            <span>{user.name}</span> <ChevronDown />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
+            Sign out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </nav>
+  );
+};
+
+export default Navbar;

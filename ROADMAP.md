@@ -1,4 +1,4 @@
-on initial app (empty db) - register admin account
+on initial app (empty db) - register admin account - DONE
 
 admin account can create jobs
 - Job title

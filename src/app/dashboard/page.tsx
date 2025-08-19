@@ -1,13 +1,10 @@
 import React from "react";
 import { auth, signOut } from "~/server/auth";
-import { redirect } from "next/navigation";
 
 const Dashboard = async () => {
   const session = await auth();
 
-  if (!session?.user) {
-    redirect("/auth/signin");
-  }
+  const user = session!.user;
 
   return (
     <div className="container mx-auto p-6">
@@ -19,14 +16,14 @@ const Dashboard = async () => {
         <div className="space-y-2">
           {JSON.stringify(session)}
           <p>
-            <span className="font-medium">User ID:</span> {session.user.id}
+            <span className="font-medium">User ID:</span> {user.id}
           </p>
           <p>
             <span className="font-medium">Name:</span>{" "}
-            {session.user.name ?? "Not provided"}
+            {user.name ?? "Not provided"}
           </p>
           <p>
-            <span className="font-medium">Email:</span> {session.user.email}
+            <span className="font-medium">Email:</span> {user.email}
           </p>
         </div>
 
