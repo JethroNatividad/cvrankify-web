@@ -15,13 +15,14 @@ import {
 } from "~/app/_components/ui/form";
 import { Input } from "~/app/_components/ui/input";
 import { Button } from "~/app/_components/ui/button";
+import { TagsInput } from "~/app/_components/ui/tags-input";
 import { Loader2 } from "lucide-react";
 
 const formSchema = z
   .object({
     title: z.string().min(1, "Title is required").max(255, "Title is too long"),
     description: z.string().min(1, "Description is required"),
-    skills: z.string().min(1, "Skills are required"),
+    skills: z.array(z.string()).min(1, "At least one skill is required"),
     yearsOfExperience: z.coerce
       .number()
       .min(0, "Years of experience must be 0 or greater")
@@ -84,7 +85,7 @@ const CreateJobForm = () => {
     defaultValues: {
       title: "",
       description: "",
-      skills: "",
+      skills: [],
       yearsOfExperience: 0,
       education: "",
       location: "",
@@ -99,8 +100,13 @@ const CreateJobForm = () => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    // Convert skills array to string for database storage
+    const submitData = {
+      ...values,
+      skills: values.skills.join(", "),
+    };
     // TODO: Implement job creation
-    console.log(values);
+    console.log(submitData);
   }
 
   return (
@@ -156,14 +162,15 @@ const CreateJobForm = () => {
               <FormItem>
                 <FormLabel>Required Skills</FormLabel>
                 <FormControl>
-                  <textarea
-                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="e.g. React, TypeScript, Node.js, SQL, AWS..."
-                    {...field}
+                  <TagsInput
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Type a skill and press Enter (e.g. React, TypeScript, Node.js...)"
                   />
                 </FormControl>
                 <FormDescription>
-                  List the technical skills and competencies required
+                  Type skills and press Enter or comma to add them. Click X to
+                  remove.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
