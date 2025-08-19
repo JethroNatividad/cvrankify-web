@@ -1,4 +1,5 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import bcrypt from "bcryptjs";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -66,9 +67,12 @@ export const authConfig = {
           return null;
         }
 
-        // For now, we'll store passwords as plain text for simplicity
-        // In production, you should hash passwords using bcrypt
-        if (credentials.password !== user.password) {
+        // using bcryptjs
+        const matches = await bcrypt.compare(
+          credentials.password as string,
+          user.password,
+        );
+        if (!matches) {
           return null;
         }
 
