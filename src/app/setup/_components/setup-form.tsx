@@ -15,6 +15,9 @@ import {
   FormMessage,
 } from "~/app/_components/ui/form";
 import { Input } from "~/app/_components/ui/input";
+import { toast } from "sonner";
+import { Button } from "~/app/_components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z
   .object({
@@ -41,10 +44,11 @@ const SetupForm = () => {
 
   const createUser = api.setup.createUser.useMutation({
     onSuccess: () => {
+      toast.success("User created successfully!");
       form.reset();
     },
     onError: (error) => {
-      console.error("Error creating user:", error);
+      toast.error(`Error creating user: ${error.message}`);
     },
   });
 
@@ -124,6 +128,13 @@ const SetupForm = () => {
             </FormItem>
           )}
         />
+
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          Create Account
+          {form.formState.isSubmitting && (
+            <Loader2 className="ml-1 animate-spin" />
+          )}
+        </Button>
       </form>
     </Form>
   );

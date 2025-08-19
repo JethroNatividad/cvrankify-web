@@ -7,6 +7,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 import { api } from "~/trpc/server";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { Toaster } from "./_components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "CVRankify",
@@ -35,6 +36,7 @@ export default async function RootLayout({
     <html lang="en" className={`${geist.variable}`}>
       <body>
         <TRPCReactProvider>{children}</TRPCReactProvider>
+        <Toaster />
       </body>
     </html>
   );
