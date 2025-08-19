@@ -24,6 +24,9 @@ import {
   SelectValue,
 } from "~/app/_components/ui/select";
 import { Loader2 } from "lucide-react";
+import { api } from "~/trpc/react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const formSchema = z
   .object({
@@ -84,6 +87,8 @@ const formSchema = z
   );
 
 const CreateJobForm = () => {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -91,7 +96,7 @@ const CreateJobForm = () => {
       description: "",
       skills: [],
       yearsOfExperience: 0,
-      educationDegree: undefined,
+      educationDegree: "High School",
       educationField: "",
       timezone: "",
       skillsWeight: 0.4,
@@ -103,14 +108,24 @@ const CreateJobForm = () => {
     },
   });
 
+  const createJob = api.job.create.useMutation({
+    onSuccess: () => {
+      toast.success("Job created successfully!");
+      router.push("/dashboard/jobs");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Convert skills array to string for database storage
     const submitData = {
       ...values,
       skills: values.skills.join(", "),
     };
-    // TODO: Implement job creation
-    console.log(submitData);
+
+    await createJob.mutateAsync(submitData);
   }
 
   return (
@@ -515,9 +530,9 @@ const CreateJobForm = () => {
           </div>
         </div>
 
-        <Button type="submit" disabled={false}>
+        <Button type="submit" disabled={createJob.isPending}>
           Create Job Posting
-          {false && <Loader2 className="ml-1 animate-spin" />}
+          {createJob.isPending && <Loader2 className="ml-1 animate-spin" />}
         </Button>
       </form>
     </Form>

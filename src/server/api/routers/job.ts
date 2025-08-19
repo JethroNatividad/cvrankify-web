@@ -1,0 +1,83 @@
+import { z } from "zod";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+
+export const jobRouter = createTRPCRouter({
+  create: protectedProcedure
+    .input(
+      z.object({
+        title: z.string().min(1).max(255),
+        description: z.string().min(1),
+        skills: z.string().min(1),
+        yearsOfExperience: z.number().min(0).max(50),
+        educationDegree: z.string().min(1).max(100),
+        educationField: z.string().max(100).optional(),
+        timezone: z.string().min(1).max(100),
+        skillsWeight: z.number().min(0).max(1),
+        experienceWeight: z.number().min(0).max(1),
+        educationWeight: z.number().min(0).max(1),
+        timezoneWeight: z.number().min(0).max(1),
+        interviewsNeeded: z.number().min(1).max(10),
+        hiresNeeded: z.number().min(1).max(50),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const job = await ctx.db.job.create({
+        data: {
+          title: input.title,
+          description: input.description,
+          skills: input.skills,
+          yearsOfExperience: input.yearsOfExperience,
+          educationDegree: input.educationDegree,
+          educationField: input.educationField,
+          timezone: input.timezone,
+          skillsWeight: input.skillsWeight,
+          experienceWeight: input.experienceWeight,
+          educationWeight: input.educationWeight,
+          timezoneWeight: input.timezoneWeight,
+          interviewsNeeded: input.interviewsNeeded,
+          hiresNeeded: input.hiresNeeded,
+          createdBy: { connect: { id: ctx.session.user.id } },
+        },
+      });
+      return job;
+    }),
+
+  getAll: protectedProcedure.query(async ({ ctx }) => {
+    const jobs = await ctx.db.job.findMany({
+      where: { createdById: ctx.session.user.id },
+      orderBy: { createdAt: "desc" },
+      include: {
+        createdBy: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+        _count: {
+          select: {
+            applicants: true,
+          },
+        },
+      },
+    });
+    return jobs;
+  }),
+
+  getById: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const job = await ctx.db.job.findUnique({
+        where: { id: input.id, createdById: ctx.session.user.id },
+        include: {
+          createdBy: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          applicants: true,
+        },
+      });
+      return job;
+    }),
+});
