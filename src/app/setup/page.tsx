@@ -1,3 +1,5 @@
+import SetupForm from "./_components/setup-form";
+
 export default function SetupPage() {
   return (
     <div className="container mx-auto max-w-md py-12">
@@ -16,9 +18,8 @@ export default function SetupPage() {
             continue.
           </p>
 
-          {/* Add your setup form here */}
-          <div className="bg-muted mt-4 rounded p-4">
-            <p className="text-sm">Setup form will be implemented here</p>
+          <div className="mt-4">
+            <SetupForm />
           </div>
         </div>
       </div>
