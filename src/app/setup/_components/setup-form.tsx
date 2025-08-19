@@ -19,17 +19,22 @@ import { toast } from "sonner";
 import { Button } from "~/app/_components/ui/button";
 import { Loader2 } from "lucide-react";
 
-const formSchema = z
-  .object({
-    name: z.string().min(2).max(100),
-    email: z.string().email(),
-    password: z.string().min(6),
-    repeatPassword: z.string().min(6),
-  })
-  .refine((data) => data.password === data.repeatPassword, {
+const baseFormSchema = z.object({
+  name: z.string().min(2).max(100),
+  email: z.string().email(),
+  password: z.string().min(6),
+  repeatPassword: z.string().min(6),
+});
+
+const formSchema = baseFormSchema.refine(
+  (data) => data.password === data.repeatPassword,
+  {
     message: "Passwords don't match",
     path: ["repeatPassword"],
-  });
+  },
+);
+
+type FormFields = keyof z.infer<typeof baseFormSchema>;
 
 const SetupForm = () => {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -48,7 +53,17 @@ const SetupForm = () => {
       form.reset();
     },
     onError: (error) => {
-      toast.error(`Error creating user: ${error.message}`);
+      const [field, message] = error.message.split(":");
+      const validFields = Object.keys(baseFormSchema.shape) as FormFields[];
+
+      if (validFields.includes(field as FormFields)) {
+        form.setError(field as FormFields, {
+          type: "manual",
+          message,
+        });
+      } else {
+        toast.error(`Error creating user: ${message}`);
+      }
     },
   });
 

@@ -18,6 +18,15 @@ export const setupRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      // Check if user email already exists
+      const existingUser = await ctx.db.user.findUnique({
+        where: { email: input.email },
+      });
+
+      if (existingUser) {
+        throw new Error("email:User with this email already exists");
+      }
+
       const hashedPassword = await bcrypt.hash(input.password, 10);
       const user = await ctx.db.user.create({
         data: {
