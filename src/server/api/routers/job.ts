@@ -80,4 +80,45 @@ export const jobRouter = createTRPCRouter({
       });
       return job;
     }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        title: z.string().min(1).max(255),
+        description: z.string().min(1),
+        skills: z.string().min(1),
+        yearsOfExperience: z.number().min(0).max(50),
+        educationDegree: z.string().min(1).max(100),
+        educationField: z.string().max(100).optional(),
+        timezone: z.string().min(1).max(100),
+        skillsWeight: z.number().min(0).max(1),
+        experienceWeight: z.number().min(0).max(1),
+        educationWeight: z.number().min(0).max(1),
+        timezoneWeight: z.number().min(0).max(1),
+        interviewsNeeded: z.number().min(1).max(10),
+        hiresNeeded: z.number().min(1).max(50),
+        isOpen: z.boolean().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id, ...updateData } = input;
+
+      // Verify the job belongs to the user
+      const existingJob = await ctx.db.job.findUnique({
+        where: { id, createdById: ctx.session.user.id },
+      });
+
+      if (!existingJob) {
+        throw new Error(
+          "Job not found or you don't have permission to edit it",
+        );
+      }
+
+      const job = await ctx.db.job.update({
+        where: { id },
+        data: updateData,
+      });
+      return job;
+    }),
 });
