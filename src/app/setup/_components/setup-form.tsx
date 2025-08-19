@@ -53,22 +53,25 @@ const SetupForm = () => {
       form.reset();
     },
     onError: (error) => {
-      const [field, message] = error.message.split(":");
-      const validFields = Object.keys(baseFormSchema.shape) as FormFields[];
+      const errorParts = error.message.split(":");
+      if (errorParts[0] && errorParts[1]) {
+        const [field, message] = errorParts;
+        const validFields = Object.keys(baseFormSchema.shape) as FormFields[];
 
-      if (validFields.includes(field as FormFields)) {
-        form.setError(field as FormFields, {
-          type: "manual",
-          message,
-        });
-      } else {
-        toast.error(`Error creating user: ${message}`);
+        if (validFields.includes(field as FormFields)) {
+          form.setError(field as FormFields, {
+            type: "manual",
+            message: message.trim(),
+          });
+          return;
+        }
       }
+      toast.error(error.message);
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    createUser.mutate({
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    await createUser.mutateAsync({
       email: values.email,
       name: values.name,
       password: values.password,
@@ -144,11 +147,9 @@ const SetupForm = () => {
           )}
         />
 
-        <Button type="submit" disabled={form.formState.isSubmitting}>
+        <Button type="submit" disabled={createUser.isPending}>
           Create Account
-          {form.formState.isSubmitting && (
-            <Loader2 className="ml-1 animate-spin" />
-          )}
+          {createUser.isPending && <Loader2 className="ml-1 animate-spin" />}
         </Button>
       </form>
     </Form>
