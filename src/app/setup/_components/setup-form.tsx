@@ -18,6 +18,7 @@ import { Input } from "~/app/_components/ui/input";
 import { toast } from "sonner";
 import { Button } from "~/app/_components/ui/button";
 import { Loader2 } from "lucide-react";
+import { signIn } from "next-auth/react";
 
 const baseFormSchema = z.object({
   name: z.string().min(2).max(100),
@@ -48,10 +49,15 @@ const SetupForm = () => {
   });
 
   const createUser = api.setup.createUser.useMutation({
-    onSuccess: () => {
-      toast.success("User created successfully!");
-      form.reset();
+    onSuccess: async () => {
+      toast.success("Success! Signing you in...");
+      await signIn("credentials", {
+        email: form.getValues("email"),
+        password: form.getValues("password"),
+        redirectTo: "/dashboard",
+      });
     },
+
     onError: (error) => {
       const errorParts = error.message.split(":");
       if (errorParts[0] && errorParts[1]) {
