@@ -3,7 +3,7 @@ import Jobs from "./_components/jobs";
 
 const Dashboard = async () => {
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto">
       <Jobs />
     </div>
   );

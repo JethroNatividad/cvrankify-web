@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import Link from "next/link";
 
 type Props = {
   user: User;
@@ -25,7 +26,9 @@ const Navbar = ({ user }: Props) => {
 
   return (
     <nav className="flex justify-between border-b px-8 py-4">
-      <h1 className="text-2xl font-bold">CVRankify</h1>
+      <Link href="/dashboard">
+        <h1 className="text-2xl font-bold">CVRankify</h1>
+      </Link>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
