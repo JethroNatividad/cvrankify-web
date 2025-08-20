@@ -32,7 +32,23 @@ const formSchema = z.object({
     .string()
     .email("Valid email is required")
     .max(255, "Email is too long"),
-  resumeFileName: z.string().min(1, "Resume file name is required"),
+  resumeFile: z
+    .instanceof(File)
+    .refine((file) => file.size > 0, "Please select a resume file")
+    .refine(
+      (file) => file.size <= 5 * 1024 * 1024,
+      "File size must be less than 5MB",
+    )
+    .refine(
+      (file) =>
+        [
+          "application/pdf",
+          "application/msword",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "text/plain",
+        ].includes(file.type),
+      "Only PDF, DOC, DOCX, and TXT files are allowed",
+    ),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -50,7 +66,6 @@ export function ApplyForm({ jobId, jobTitle }: ApplyFormProps) {
     defaultValues: {
       name: "",
       email: "",
-      resumeFileName: "",
     },
   });
 
@@ -75,8 +90,13 @@ export function ApplyForm({ jobId, jobTitle }: ApplyFormProps) {
   };
 
   const onSubmit = (data: FormData) => {
+    if (!data.resumeFile) {
+      toast.error("Please select a resume file");
+      return;
+    }
+
     // Generate a fake MinIO path based on the pattern in seed.ts
-    const resumePath = generateResumeFilename(data.resumeFileName, data.name);
+    const resumePath = generateResumeFilename(data.resumeFile.name, data.name);
 
     applyMutation.mutate({
       jobId,
@@ -172,21 +192,32 @@ export function ApplyForm({ jobId, jobTitle }: ApplyFormProps) {
 
             <FormField
               control={form.control}
-              name="resumeFileName"
-              render={({ field }) => (
+              name="resumeFile"
+              render={({ field: { value, onChange, ...field } }) => (
                 <FormItem>
-                  <FormLabel>Resume File Name</FormLabel>
+                  <FormLabel>Resume Upload</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="e.g., john-doe-resume.pdf"
-                      {...field}
+                      type="file"
+                      accept=".pdf,.doc,.docx,.txt"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          onChange(file);
+                        }
+                      }}
                       disabled={applyMutation.isPending}
+                      {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    Enter the name of your resume file (e.g.,
-                    &quot;john-doe-resume.pdf&quot;). This will be used to
-                    generate a storage path.
+                    Upload your resume in PDF, DOC, DOCX, or TXT format (max
+                    5MB).
+                    {value && (
+                      <span className="ml-2 text-xs font-medium">
+                        Selected: {value.name}
+                      </span>
+                    )}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
