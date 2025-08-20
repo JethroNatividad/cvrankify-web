@@ -111,7 +111,7 @@ const CreateJobForm = () => {
   const createJob = api.job.create.useMutation({
     onSuccess: () => {
       toast.success("Job created successfully!");
-      router.push("/dashboard/jobs");
+      router.push("/dashboard/");
     },
     onError: (error) => {
       toast.error(error.message);
