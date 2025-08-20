@@ -14,7 +14,6 @@ import {
   MapPin,
   Users,
   Edit,
-  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { ExpandableDescription } from "./_components/expandable-description";
