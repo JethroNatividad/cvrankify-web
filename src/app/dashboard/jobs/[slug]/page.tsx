@@ -30,15 +30,37 @@ const JobPage = async ({ params }: JobPageProps) => {
     return (
       <div className="container mx-auto py-8">
         <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold">Job Details</h1>
-            <p className="text-muted-foreground mt-2">
-              View and manage your job posting
-            </p>
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="mb-2 flex items-center gap-3">
+                <h1 className="text-2xl font-bold">Invalid Job ID</h1>
+                <Badge variant="destructive">Error</Badge>
+              </div>
+              <p className="text-muted-foreground">
+                The provided job ID is not valid
+              </p>
+            </div>
           </div>
-          <div className="rounded-lg border p-6">
-            <div className="py-8 text-center">
-              <p className="text-red-500">Invalid job ID provided</p>
+
+          {/* Error Details */}
+          <div className="rounded-lg border">
+            <div className="p-6 text-center">
+              <div className="space-y-4">
+                <div className="text-lg font-medium text-red-600">
+                  Invalid Job ID Provided
+                </div>
+                <p className="text-muted-foreground">
+                  The job ID in the URL is not a valid number. Please check the
+                  URL and try again.
+                </p>
+                <Button asChild>
+                  <Link href="/dashboard/">
+                    <Edit className="mr-2 h-4 w-4" />
+                    Back to Jobs
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -52,15 +74,37 @@ const JobPage = async ({ params }: JobPageProps) => {
     return (
       <div className="container mx-auto py-8">
         <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold">Job Details</h1>
-            <p className="text-muted-foreground mt-2">
-              View and manage your job posting
-            </p>
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="mb-2 flex items-center gap-3">
+                <h1 className="text-2xl font-bold">Job Not Found</h1>
+                <Badge variant="destructive">Error</Badge>
+              </div>
+              <p className="text-muted-foreground">
+                Job ID #{jobId} could not be found
+              </p>
+            </div>
           </div>
-          <div className="rounded-lg border p-6">
-            <div className="py-8 text-center">
-              <p className="text-red-500">Job not found</p>
+
+          {/* Error Details */}
+          <div className="rounded-lg border">
+            <div className="p-6 text-center">
+              <div className="space-y-4">
+                <div className="text-lg font-medium text-red-600">
+                  Job Not Found
+                </div>
+                <p className="text-muted-foreground">
+                  The job you&apos;re looking for doesn&apos;t exist or you
+                  don&apos;t have permission to view it.
+                </p>
+                <Button asChild>
+                  <Link href="/dashboard/">
+                    <Edit className="mr-2 h-4 w-4" />
+                    Back to Jobs
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
