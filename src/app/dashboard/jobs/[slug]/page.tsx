@@ -17,6 +17,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
+import { ExpandableDescription } from "./_components/expandable-description";
 
 interface JobPageProps {
   params: Promise<{ slug: string }>;
@@ -236,9 +237,10 @@ const JobPage = async ({ params }: JobPageProps) => {
                   <h4 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
                     Job Description
                   </h4>
-                  <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
-                    {job.description}
-                  </p>
+                  <ExpandableDescription
+                    description={job.description}
+                    maxLength={200}
+                  />
                 </div>
               </div>
             </CollapsibleContent>
