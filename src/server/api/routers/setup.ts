@@ -9,6 +9,11 @@ export const setupRouter = createTRPCRouter({
     return ctx.db.user.count();
   }),
 
+  getCompanyName: publicProcedure.query(async ({ ctx }) => {
+    const settings = await ctx.db.appSettings.findFirst();
+    return settings?.companyName ?? "CVRankify";
+  }),
+
   createUser: publicProcedure
     .input(
       z.object({

@@ -17,9 +17,10 @@ import Link from "next/link";
 
 type Props = {
   user?: User;
+  companyName?: string;
 };
 
-const Navbar = ({ user }: Props) => {
+const Navbar = ({ user, companyName }: Props) => {
   const handleSignOut = async () => {
     await signOut();
   };
@@ -27,7 +28,7 @@ const Navbar = ({ user }: Props) => {
   return (
     <nav className="flex justify-between border-b px-8 py-4">
       <Link href="/jobs">
-        <h1 className="text-2xl font-bold">CVRankify</h1>
+        <h1 className="text-2xl font-bold">{companyName ?? "CVRankify"}</h1>
       </Link>
 
       {user && (
