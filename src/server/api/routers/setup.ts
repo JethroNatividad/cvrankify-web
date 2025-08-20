@@ -15,6 +15,7 @@ export const setupRouter = createTRPCRouter({
         name: z.string().min(2),
         email: z.string().email(),
         password: z.string().min(6),
+        companyName: z.string().min(2),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -36,6 +37,13 @@ export const setupRouter = createTRPCRouter({
           isAdmin: true,
         },
       });
+
+      await ctx.db.appSettings.create({
+        data: {
+          companyName: input.companyName,
+        },
+      });
+
       return user;
     }),
 });

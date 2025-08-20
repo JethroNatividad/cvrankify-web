@@ -25,6 +25,7 @@ const baseFormSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   repeatPassword: z.string().min(6),
+  companyName: z.string().min(2).max(100),
 });
 
 const formSchema = baseFormSchema.refine(
@@ -45,6 +46,7 @@ const SetupForm = () => {
       email: "",
       password: "",
       repeatPassword: "",
+      companyName: "",
     },
   });
 
@@ -81,6 +83,7 @@ const SetupForm = () => {
       email: values.email,
       name: values.name,
       password: values.password,
+      companyName: values.companyName,
     });
   }
 
@@ -97,6 +100,21 @@ const SetupForm = () => {
                 <Input placeholder="Admin" {...field} />
               </FormControl>
               <FormDescription>This is your display name.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="companyName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Company Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Acme Corporation" {...field} />
+              </FormControl>
+              <FormDescription>The name of your organization.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
