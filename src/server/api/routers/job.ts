@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { JobWithStringWeights } from "~/lib/types";
+import type { SerializedJob } from "~/lib/types";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const jobRouter = createTRPCRouter({
@@ -85,7 +85,7 @@ export const jobRouter = createTRPCRouter({
       }
 
       //   Convert Decimal fields to strings
-      const jobWithStringWeights: JobWithStringWeights = {
+      const serializedJob: SerializedJob = {
         ...job,
         skillsWeight: job.skillsWeight?.toString() ?? "0",
         experienceWeight: job.experienceWeight?.toString() ?? "0",
@@ -93,8 +93,17 @@ export const jobRouter = createTRPCRouter({
         timezoneWeight: job.timezoneWeight
           ? Number(job.timezoneWeight).toString()
           : "0",
+        applicants: job.applicants.map((applicant) => ({
+          ...applicant,
+          skillsScoreAI: applicant.skillsScoreAI?.toString() ?? "0",
+          experienceScoreAI: applicant.experienceScoreAI?.toString() ?? "0",
+          educationScoreAI: applicant.educationScoreAI?.toString() ?? "0",
+          timezoneScoreAI: applicant.timezoneScoreAI?.toString() ?? "0",
+          overallScoreAI: applicant.overallScoreAI?.toString() ?? "0",
+        })),
       };
-      return jobWithStringWeights;
+
+      return serializedJob;
     }),
 
   update: protectedProcedure

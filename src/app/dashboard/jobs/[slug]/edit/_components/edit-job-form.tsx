@@ -27,8 +27,7 @@ import { Loader2 } from "lucide-react";
 import { api } from "~/trpc/react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import type { Job } from "@prisma/client";
-import type { JobWithStringWeights } from "~/lib/types";
+import type { SerializedJob } from "~/lib/types";
 
 const formSchema = z
   .object({
@@ -90,7 +89,7 @@ const formSchema = z
   );
 
 interface EditJobFormProps {
-  job: JobWithStringWeights;
+  job: SerializedJob;
 }
 
 const EditJobForm = ({ job }: EditJobFormProps) => {
