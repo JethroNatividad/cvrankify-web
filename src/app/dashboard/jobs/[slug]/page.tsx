@@ -8,15 +8,12 @@ import {
   CollapsibleTrigger,
 } from "~/app/_components/ui/collapsible";
 import {
-  CalendarDays,
   ChevronDown,
   Clock,
   GraduationCap,
   MapPin,
   Users,
   Edit,
-  Briefcase,
-  Target,
   TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
@@ -99,7 +96,6 @@ const JobPage = async ({ params }: JobPageProps) => {
           </Button>
         </div>
 
-        {/* Job Details - Compact Collapsible */}
         <Collapsible defaultOpen>
           <div className="rounded-lg border">
             <CollapsibleTrigger asChild>
@@ -108,72 +104,139 @@ const JobPage = async ({ params }: JobPageProps) => {
                 size="lg"
                 className="hover:bg-muted/50 flex w-full justify-between p-4 text-left text-base font-medium"
               >
-                Job Details
+                Job Details & Requirements
                 <ChevronDown className="h-4 w-4" />
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="px-4 pt-2 pb-4">
               <div className="space-y-4 text-sm">
-                {/* Quick Stats */}
-                <div className="text-muted-foreground flex items-center gap-4">
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    {job.yearsOfExperience}y exp
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <GraduationCap className="h-4 w-4" />
-                    {job.educationDegree}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    {job.timezone}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    {job.hires}/{job.hiresNeeded} hired
-                  </span>
-                </div>
+                {/* Requirements Grid */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <h4 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                      Requirements
+                    </h4>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-3.5 w-3.5 text-blue-500" />
+                        <span className="text-sm">
+                          {job.yearsOfExperience}+ years experience
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <GraduationCap className="h-3.5 w-3.5 text-green-500" />
+                        <span className="text-sm">
+                          {job.educationDegree} degree
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-3.5 w-3.5 text-purple-500" />
+                        <span className="text-sm">{job.timezone} timezone</span>
+                      </div>
+                    </div>
+                  </div>
 
-                {/* Skills */}
-                <div>
-                  <div className="flex flex-wrap gap-2">
-                    {skills.slice(0, 6).map((skill, index) => (
-                      <Badge
-                        key={index}
-                        variant="outline"
-                        className="px-2 py-0.5 text-xs"
-                      >
-                        {skill}
-                      </Badge>
-                    ))}
-                    {skills.length > 6 && (
-                      <Badge variant="outline" className="px-2 py-0.5 text-xs">
-                        +{skills.length - 6} more
-                      </Badge>
-                    )}
+                  <div className="space-y-2">
+                    <h4 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                      Progress
+                    </h4>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-3.5 w-3.5 text-orange-500" />
+                        <span className="text-sm">
+                          {job.hires}/{job.hiresNeeded} positions filled
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="h-3.5 w-3.5 rounded-full bg-emerald-500" />
+                        <span className="text-sm">
+                          {applicationCount} total applications
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="h-3.5 w-3.5 rounded-full bg-amber-500" />
+                        <span className="text-sm">
+                          {Math.round(
+                            ((job.hiresNeeded - job.hires) / job.hiresNeeded) *
+                              100,
+                          )}
+                          % remaining
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Weights - Compact */}
-                <div className="text-muted-foreground flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  <span>Weights:</span>
-                  <span className="text-blue-600">
-                    {Number(Number(job.skillsWeight) * 100).toFixed(0)}% skills
-                  </span>
-                  <span className="text-green-600">
-                    {Number(Number(job.experienceWeight) * 100).toFixed(0)}% exp
-                  </span>
-                  <span className="text-purple-600">
-                    {Number(Number(job.educationWeight) * 100).toFixed(0)}% edu
-                  </span>
-                  <span className="text-orange-600">
-                    {Number(Number(job.timezoneWeight) * 100).toFixed(0)}% tz
-                  </span>
+                {/* Skills & Weights Combined */}
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
+                      Required Skills
+                    </h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {skills.map((skill, index) => (
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="px-2 py-0.5 text-xs font-medium"
+                        >
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
+                      Evaluation Weights
+                    </h4>
+                    <div className="grid grid-cols-4 gap-2">
+                      <div className="text-center">
+                        <div className="text-sm font-semibold text-blue-600">
+                          {Number(Number(job.skillsWeight) * 100).toFixed(0)}%
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          Skills
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-sm font-semibold text-green-600">
+                          {Number(Number(job.experienceWeight) * 100).toFixed(
+                            0,
+                          )}
+                          %
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          Experience
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-sm font-semibold text-purple-600">
+                          {Number(Number(job.educationWeight) * 100).toFixed(0)}
+                          %
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          Education
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-sm font-semibold text-orange-600">
+                          {Number(Number(job.timezoneWeight) * 100).toFixed(0)}%
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          Timezone
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="pt-2">
-                  <p className="text-muted-foreground line-clamp-2 text-sm leading-relaxed">
+                {/* Description */}
+                <div>
+                  <h4 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
+                    Job Description
+                  </h4>
+                  <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
                     {job.description}
                   </p>
                 </div>
@@ -183,14 +246,35 @@ const JobPage = async ({ params }: JobPageProps) => {
         </Collapsible>
 
         <div className="rounded-lg border">
-          <div className="flex items-center justify-between border-b p-3">
-            <h2 className="font-medium">Applicants</h2>
-            <Badge variant="outline" className="text-xs">
-              {applicationCount}
-            </Badge>
+          <div className="flex items-center justify-between border-b p-4">
+            <div>
+              <h2 className="text-base font-medium">Applicant Pipeline</h2>
+              <p className="text-muted-foreground text-sm">
+                {applicationCount} total applications •{" "}
+                {job.hiresNeeded - job.hires} positions remaining
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs">
+                {applicationCount} Applied
+              </Badge>
+              <Badge variant="default" className="text-xs">
+                {job.hires} Hired
+              </Badge>
+            </div>
           </div>
           <div className="text-muted-foreground p-6 text-center text-sm">
-            applicants table (dont touch for now)
+            <div className="space-y-2">
+              <div className="text-foreground text-lg font-medium">
+                Applicant Management Coming Soon
+              </div>
+              <p>Review, score, and manage candidates for this position</p>
+              <div className="mt-4 flex justify-center gap-4 text-xs">
+                <span>• AI-powered scoring</span>
+                <span>• Interview scheduling</span>
+                <span>• Candidate communications</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
