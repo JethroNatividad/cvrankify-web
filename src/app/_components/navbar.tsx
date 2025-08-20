@@ -16,7 +16,7 @@ import {
 import Link from "next/link";
 
 type Props = {
-  user: User;
+  user?: User;
 };
 
 const Navbar = ({ user }: Props) => {
@@ -30,20 +30,22 @@ const Navbar = ({ user }: Props) => {
         <h1 className="text-2xl font-bold">CVRankify</h1>
       </Link>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="flex items-center">
-            <span>{user.name}</span> <ChevronDown />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
-            Sign out
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {user && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="flex items-center">
+              <span>{user.name}</span> <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </nav>
   );
 };

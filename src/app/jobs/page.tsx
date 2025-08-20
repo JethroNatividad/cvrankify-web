@@ -4,18 +4,16 @@ import { LatestPost } from "~/app/_components/post";
 import { auth } from "~/server/auth";
 import { api, HydrateClient } from "~/trpc/server";
 import { Button } from "../_components/ui/button";
+import PublicJobs from "./_components/public-jobs";
 
 export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
   const session = await auth();
-
-  // if (session?.user) {
-  //   void api.post.getLatest.prefetch();
-  // }
 
   return (
     <HydrateClient>
-      <main>Jobs</main>
+      <div className="container mx-auto">
+        <PublicJobs />
+      </div>
     </HydrateClient>
   );
 }
