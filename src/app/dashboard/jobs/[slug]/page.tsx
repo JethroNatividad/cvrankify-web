@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { ExpandableDescription } from "./_components/expandable-description";
+import { ApplicantsTable } from "./_components/applicants-table";
 
 interface JobPageProps {
   params: Promise<{ slug: string }>;
@@ -290,38 +291,7 @@ const JobPage = async ({ params }: JobPageProps) => {
           </div>
         </Collapsible>
 
-        <div className="rounded-lg border">
-          <div className="flex items-center justify-between border-b p-4">
-            <div>
-              <h2 className="text-base font-medium">Applicant Pipeline</h2>
-              <p className="text-muted-foreground text-sm">
-                {applicationCount} total applications •{" "}
-                {job.hiresNeeded - job.hires} positions remaining
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-xs">
-                {applicationCount} Applied
-              </Badge>
-              <Badge variant="default" className="text-xs">
-                {job.hires} Hired
-              </Badge>
-            </div>
-          </div>
-          <div className="text-muted-foreground p-6 text-center text-sm">
-            <div className="space-y-2">
-              <div className="text-foreground text-lg font-medium">
-                Applicant Management Coming Soon
-              </div>
-              <p>Review, score, and manage candidates for this position</p>
-              <div className="mt-4 flex justify-center gap-4 text-xs">
-                <span>• AI-powered scoring</span>
-                <span>• Interview scheduling</span>
-                <span>• Candidate communications</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ApplicantsTable job={job} />
       </div>
     </div>
   );
