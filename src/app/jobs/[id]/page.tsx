@@ -11,10 +11,10 @@ import {
   Building,
   Calendar,
   ArrowLeft,
-  ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ApplyForm } from "./_components/apply-form";
 
 interface PublicJobPageProps {
   params: Promise<{ id: string }>;
@@ -201,25 +201,7 @@ const PublicJobPage = async ({ params }: PublicJobPageProps) => {
           </Card>
 
           {/* Apply Section */}
-          <Card>
-            <CardHeader>
-              <h3 className="text-lg font-semibold">Ready to Apply?</h3>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground text-sm">
-                Interested in this position? Application system coming soon.
-              </p>
-              <div className="space-y-2">
-                <Button className="w-full" disabled>
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  Apply Now (Coming Soon)
-                </Button>
-                <Button variant="outline" className="w-full" asChild>
-                  <Link href="/jobs">Browse More Jobs</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <ApplyForm jobId={jobId} jobTitle={job.title} />
 
           {/* Company Info */}
           <Card>

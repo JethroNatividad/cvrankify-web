@@ -121,7 +121,7 @@ const PublicJobCard = ({ job }: PublicJobCardProps) => {
         <Button asChild className="w-full">
           <Link href={`/jobs/${job.id}`}>
             <Eye className="mr-2 h-4 w-4" />
-            View Details
+            View & Apply
           </Link>
         </Button>
       </CardContent>
