@@ -10,10 +10,53 @@ import {
   TableHeader,
   TableRow,
 } from "~/app/_components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/app/_components/ui/tooltip";
 import type { SerializedJob } from "~/lib/types";
 
 interface ApplicantsTableProps {
   job: SerializedJob;
+}
+
+interface ScoreTooltipProps {
+  score: number;
+  label: string;
+  feedback?: string | null;
+  color: string;
+}
+
+function ScoreTooltip({ score, label, feedback, color }: ScoreTooltipProps) {
+  if (!feedback) {
+    return (
+      <div className="text-center">
+        <div className={`text-sm font-medium ${color}`}>
+          {(score * 100).toFixed(0)}%
+        </div>
+        <div className="text-muted-foreground text-xs">{label}</div>
+      </div>
+    );
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="cursor-help text-center">
+          <div className={`text-sm font-medium ${color}`}>
+            {(score * 100).toFixed(0)}%
+          </div>
+          <div className="text-muted-foreground text-xs">{label}</div>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-xs">
+        <p className="font-medium">AI Feedback - {label}</p>
+        <p className="text-sm">{feedback}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
 }
 
 const formatTimeAgo = (date: Date | string): string => {
@@ -101,142 +144,148 @@ export function ApplicantsTable({ job: { applicants } }: ApplicantsTableProps) {
   };
 
   return (
-    <div className="rounded-lg border">
-      <div className="flex items-center justify-between border-b p-4">
-        <div>
-          <h2 className="text-base font-medium">Applicants</h2>
-          <p className="text-muted-foreground text-sm">
-            {applicants.length} total application
-            {applicants.length !== 1 ? "s" : ""}
-          </p>
+    <TooltipProvider>
+      <div className="rounded-lg border">
+        <div className="flex items-center justify-between border-b p-4">
+          <div>
+            <h2 className="text-base font-medium">Applicants</h2>
+            <p className="text-muted-foreground text-sm">
+              {applicants.length} total application
+              {applicants.length !== 1 ? "s" : ""}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs">
+              {applicants.length} Applied
+            </Badge>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-xs">
-            {applicants.length} Applied
-          </Badge>
-        </div>
-      </div>
 
-      <div className="relative overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[200px]">Applicant</TableHead>
-              <TableHead className="w-[120px]">Overall Score</TableHead>
-              <TableHead className="w-[100px]">AI Status</TableHead>
-              <TableHead className="w-[120px]">Interview Status</TableHead>
-              <TableHead className="w-[100px]">Applied</TableHead>
-              <TableHead className="w-[300px]">Assessment</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {applicants.map((applicant) => {
-              const overallScore = parseFloat(applicant.overallScoreAI);
-              const skillsScore = parseFloat(applicant.skillsScoreAI);
-              const experienceScore = parseFloat(applicant.experienceScoreAI);
-              const educationScore = parseFloat(applicant.educationScoreAI);
-              const timezoneScore = parseFloat(applicant.timezoneScoreAI);
+        <div className="relative overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[200px]">Applicant</TableHead>
+                <TableHead className="w-[120px]">Overall Score</TableHead>
+                <TableHead className="w-[100px]">AI Status</TableHead>
+                <TableHead className="w-[120px]">Interview Status</TableHead>
+                <TableHead className="w-[100px]">Applied</TableHead>
+                <TableHead className="w-[300px]">Assessment</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {applicants.map((applicant) => {
+                const overallScore = parseFloat(applicant.overallScoreAI);
+                const skillsScore = parseFloat(applicant.skillsScoreAI);
+                const experienceScore = parseFloat(applicant.experienceScoreAI);
+                const educationScore = parseFloat(applicant.educationScoreAI);
+                const timezoneScore = parseFloat(applicant.timezoneScoreAI);
 
-              return (
-                <TableRow key={applicant.id}>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="font-medium">{applicant.name}</div>
+                return (
+                  <TableRow key={applicant.id}>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="font-medium">{applicant.name}</div>
+                        <div className="text-muted-foreground text-sm">
+                          {applicant.email}
+                        </div>
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      {applicant.statusAI === "completed" ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="cursor-help text-center">
+                              <div className="text-lg font-semibold">
+                                {(overallScore * 100).toFixed(0)}%
+                              </div>
+                              <div className="text-muted-foreground text-xs">
+                                Overall
+                              </div>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs">
+                            <p className="font-medium">AI Feedback - Overall</p>
+                            {applicant.overallFeedbackAI && (
+                              <p className="text-sm">
+                                {applicant.overallFeedbackAI}
+                              </p>
+                            )}
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <div className="text-muted-foreground text-center text-sm">
+                          Pending
+                        </div>
+                      )}
+                    </TableCell>
+
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={`text-xs ${getAIStatusColor(applicant.statusAI)}`}
+                      >
+                        {applicant.statusAI}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell>
+                      <Badge
+                        variant={getStatusColor(applicant.interviewStatus)}
+                        className="text-xs"
+                      >
+                        {applicant.interviewStatus}
+                      </Badge>
+                    </TableCell>
+
+                    <TableCell>
                       <div className="text-muted-foreground text-sm">
-                        {applicant.email}
+                        {formatTimeAgo(applicant.createdAt)}
                       </div>
-                    </div>
-                  </TableCell>
+                    </TableCell>
 
-                  <TableCell>
-                    {applicant.statusAI === "completed" ? (
-                      <div className="text-center">
-                        <div className="text-lg font-semibold">
-                          {(overallScore * 100).toFixed(0)}%
+                    <TableCell>
+                      {applicant.statusAI === "completed" ? (
+                        <div className="grid grid-cols-4 gap-2">
+                          <ScoreTooltip
+                            score={skillsScore}
+                            label="Skills"
+                            feedback={applicant.skillsFeedbackAI}
+                            color="text-blue-600"
+                          />
+                          <ScoreTooltip
+                            score={experienceScore}
+                            label="Exp"
+                            feedback={applicant.experienceFeedbackAI}
+                            color="text-green-600"
+                          />
+                          <ScoreTooltip
+                            score={educationScore}
+                            label="Edu"
+                            feedback={applicant.educationFeedbackAI}
+                            color="text-purple-600"
+                          />
+                          <ScoreTooltip
+                            score={timezoneScore}
+                            label="Time"
+                            feedback={applicant.timezoneFeedbackAI}
+                            color="text-orange-600"
+                          />
                         </div>
-                        <div className="text-muted-foreground text-xs">
-                          Overall
+                      ) : (
+                        <div className="text-muted-foreground text-center text-sm">
+                          Processing...
                         </div>
-                      </div>
-                    ) : (
-                      <div className="text-muted-foreground text-center text-sm">
-                        Pending
-                      </div>
-                    )}
-                  </TableCell>
-
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={`text-xs ${getAIStatusColor(applicant.statusAI)}`}
-                    >
-                      {applicant.statusAI}
-                    </Badge>
-                  </TableCell>
-
-                  <TableCell>
-                    <Badge
-                      variant={getStatusColor(applicant.interviewStatus)}
-                      className="text-xs"
-                    >
-                      {applicant.interviewStatus}
-                    </Badge>
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="text-muted-foreground text-sm">
-                      {formatTimeAgo(applicant.createdAt)}
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    {applicant.statusAI === "completed" ? (
-                      <div className="grid grid-cols-4 gap-2">
-                        <div className="text-center">
-                          <div className="text-sm font-medium text-blue-600">
-                            {(skillsScore * 100).toFixed(0)}%
-                          </div>
-                          <div className="text-muted-foreground text-xs">
-                            Skills
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-sm font-medium text-green-600">
-                            {(experienceScore * 100).toFixed(0)}%
-                          </div>
-                          <div className="text-muted-foreground text-xs">
-                            Exp
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-sm font-medium text-purple-600">
-                            {(educationScore * 100).toFixed(0)}%
-                          </div>
-                          <div className="text-muted-foreground text-xs">
-                            Edu
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-sm font-medium text-orange-600">
-                            {(timezoneScore * 100).toFixed(0)}%
-                          </div>
-                          <div className="text-muted-foreground text-xs">
-                            Time
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-muted-foreground text-center text-sm">
-                        Processing...
-                      </div>
-                    )}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 }
