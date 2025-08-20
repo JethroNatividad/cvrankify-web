@@ -26,7 +26,7 @@ const Navbar = ({ user }: Props) => {
 
   return (
     <nav className="flex justify-between border-b px-8 py-4">
-      <Link href="/dashboard">
+      <Link href="/jobs">
         <h1 className="text-2xl font-bold">CVRankify</h1>
       </Link>
 

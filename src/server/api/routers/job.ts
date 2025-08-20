@@ -1,6 +1,10 @@
 import { z } from "zod";
 import type { SerializedJob } from "~/lib/types";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
 export const jobRouter = createTRPCRouter({
   create: protectedProcedure
@@ -145,5 +149,59 @@ export const jobRouter = createTRPCRouter({
         data: updateData,
       });
       return job;
+    }),
+
+  // Public routes for job listings
+  getAllPublic: publicProcedure.query(async ({ ctx }) => {
+    const jobs = await ctx.db.job.findMany({
+      where: { isOpen: true },
+      orderBy: { createdAt: "desc" },
+      include: {
+        createdBy: {
+          select: {
+            name: true,
+          },
+        },
+        _count: {
+          select: {
+            applicants: true,
+          },
+        },
+      },
+    });
+    return jobs;
+  }),
+
+  getByIdPublic: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const job = await ctx.db.job.findUnique({
+        where: { id: input.id, isOpen: true },
+        include: {
+          createdBy: {
+            select: {
+              name: true,
+            },
+          },
+          _count: {
+            select: {
+              applicants: true,
+            },
+          },
+        },
+      });
+
+      if (!job) {
+        return null;
+      }
+
+      // For public view, convert Decimal fields to numbers for display
+      return {
+        ...job,
+        skillsWeight: Number(job.skillsWeight),
+        experienceWeight: Number(job.experienceWeight),
+        educationWeight: Number(job.educationWeight),
+        timezoneWeight: Number(job.timezoneWeight),
+      };
     }),
 });
