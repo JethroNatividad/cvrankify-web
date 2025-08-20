@@ -62,7 +62,7 @@ const PublicJobCard = ({ job }: PublicJobCardProps) => {
         </p>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="flex h-full flex-col justify-between space-y-4">
         {/* Requirements */}
         <div className="space-y-2">
           <h4 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">

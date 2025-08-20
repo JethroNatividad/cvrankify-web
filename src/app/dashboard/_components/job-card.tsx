@@ -60,7 +60,7 @@ export default function JobCard({ job }: JobCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="flex h-full flex-col justify-between space-y-4">
         {/* Skills */}
         <div>
           <h4 className="mb-2 text-sm font-medium">Required Skills</h4>
