@@ -90,7 +90,9 @@ export const jobRouter = createTRPCRouter({
         skillsWeight: job.skillsWeight?.toString() ?? "0",
         experienceWeight: job.experienceWeight?.toString() ?? "0",
         educationWeight: job.educationWeight?.toString() ?? "0",
-        timezoneWeight: job.timezoneWeight?.toString() ?? "0",
+        timezoneWeight: job.timezoneWeight
+          ? Number(job.timezoneWeight).toString()
+          : "0",
       };
       return jobWithStringWeights;
     }),
