@@ -38,7 +38,7 @@ const formSchema = z
       .number()
       .min(0, "Years of experience must be 0 or greater")
       .max(50, "Years of experience seems too high"),
-    educationDegree: z.enum(["High School", "Bachelor", "Master", "PhD"]),
+    educationDegree: z.enum(["None", "High School", "Bachelor", "Master", "PhD"]),
     educationField: z
       .string()
       .max(100, "Education field is too long")
@@ -375,6 +375,7 @@ const EditJobForm = ({ job }: EditJobFormProps) => {
                         <SelectValue placeholder="Select degree level" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="None">None</SelectItem>
                         <SelectItem value="High School">High School</SelectItem>
                         <SelectItem value="Bachelor">
                           Bachelor&apos;s Degree
@@ -423,6 +424,27 @@ const EditJobForm = ({ job }: EditJobFormProps) => {
             Set the importance of each criteria in candidate evaluation. All
             weights must sum to 1.00.
           </p>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="font-medium">Current Sum:</span>
+            <span 
+              className={`font-mono ${
+                Math.abs(
+                  Number(form.watch('skillsWeight')) + 
+                  Number(form.watch('experienceWeight')) + 
+                  Number(form.watch('educationWeight')) + 
+                  Number(form.watch('timezoneWeight')) - 1
+                ) < 0.01 ? 'text-green-600' : 'text-red-600'
+              }`}
+            >
+              {(
+                Number(form.watch('skillsWeight')) + 
+                Number(form.watch('experienceWeight')) + 
+                Number(form.watch('educationWeight')) + 
+                Number(form.watch('timezoneWeight'))
+              ).toFixed(2)}
+            </span>
+            <span className="text-muted-foreground">/ 1.00</span>
+          </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField

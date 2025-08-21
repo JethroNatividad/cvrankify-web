@@ -3,7 +3,7 @@ import CreateJobForm from "./_components/create-job-form";
 
 const CreateJobPage = () => {
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto px-6   py-8">
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Create New Job</h1>

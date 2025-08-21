@@ -30,7 +30,7 @@ const Jobs = () => {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto px-6 py-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold">Jobs</h2>
