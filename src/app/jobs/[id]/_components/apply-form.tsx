@@ -60,6 +60,7 @@ interface ApplyFormProps {
 
 export function ApplyForm({ jobId, jobTitle }: ApplyFormProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -80,30 +81,53 @@ export function ApplyForm({ jobId, jobTitle }: ApplyFormProps) {
     },
   });
 
-  const generateResumeFilename = (fileName: string, applicantName: string) => {
-    const timestamp = new Date().getFullYear();
-    const sanitizedName = applicantName.toLowerCase().replace(/\s+/g, "-");
-    const extension = fileName.includes(".")
-      ? fileName.split(".").pop()
-      : "pdf";
-    return `resumes/${timestamp}/${sanitizedName}-resume.${extension}`;
+  const uploadFile = async (
+    file: File,
+    applicantName: string,
+  ): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("applicantName", applicantName);
+
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = (await response.json()) as { error?: string };
+      throw new Error(errorData.error ?? "Failed to upload file");
+    }
+
+    const result = (await response.json()) as { fileName: string };
+    return result.fileName;
   };
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     if (!data.resumeFile) {
       toast.error("Please select a resume file");
       return;
     }
 
-    // Generate a fake MinIO path based on the pattern in seed.ts
-    const resumePath = generateResumeFilename(data.resumeFile.name, data.name);
+    setIsUploading(true);
+    try {
+      // Upload file to MinIO first
+      const fileName = await uploadFile(data.resumeFile, data.name);
 
-    applyMutation.mutate({
-      jobId,
-      name: data.name,
-      email: data.email,
-      resume: resumePath,
-    });
+      // Then submit the application with the file reference
+      applyMutation.mutate({
+        jobId,
+        name: data.name,
+        email: data.email,
+        resumeFileName: fileName,
+      });
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to upload file";
+      toast.error(errorMessage);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   if (isSubmitted) {
@@ -159,7 +183,7 @@ export function ApplyForm({ jobId, jobTitle }: ApplyFormProps) {
                     <Input
                       placeholder="Enter your full name"
                       {...field}
-                      disabled={applyMutation.isPending}
+                      disabled={applyMutation.isPending || isUploading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -178,7 +202,7 @@ export function ApplyForm({ jobId, jobTitle }: ApplyFormProps) {
                       type="email"
                       placeholder="Enter your email address"
                       {...field}
-                      disabled={applyMutation.isPending}
+                      disabled={applyMutation.isPending || isUploading}
                     />
                   </FormControl>
                   <FormDescription>
@@ -206,7 +230,7 @@ export function ApplyForm({ jobId, jobTitle }: ApplyFormProps) {
                           onChange(file);
                         }
                       }}
-                      disabled={applyMutation.isPending}
+                      disabled={applyMutation.isPending || isUploading}
                       {...field}
                     />
                   </FormControl>
@@ -226,11 +250,16 @@ export function ApplyForm({ jobId, jobTitle }: ApplyFormProps) {
 
             <Button
               type="submit"
-              disabled={applyMutation.isPending}
+              disabled={applyMutation.isPending || isUploading}
               className="w-full"
               size="lg"
             >
-              {applyMutation.isPending ? (
+              {isUploading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Uploading Resume...
+                </>
+              ) : applyMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Submitting Application...

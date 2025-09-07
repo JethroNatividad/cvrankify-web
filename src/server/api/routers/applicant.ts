@@ -8,7 +8,7 @@ export const applicantRouter = createTRPCRouter({
         jobId: z.number(),
         name: z.string().min(1, "Name is required").max(255),
         email: z.string().email("Valid email is required").max(255),
-        resume: z.string().min(1, "Resume content is required"),
+        resumeFileName: z.string().min(1, "Resume file name is required"),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -38,7 +38,7 @@ export const applicantRouter = createTRPCRouter({
         data: {
           name: input.name,
           email: input.email,
-          resume: input.resume,
+          resume: input.resumeFileName, // Store the MinIO file path/name
           jobId: input.jobId,
           statusAI: "pending",
           interviewStatus: "pending",
