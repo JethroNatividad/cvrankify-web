@@ -32,9 +32,10 @@ A modern web application for ranking and managing CVs/resumes, built with T3 Sta
    - `AUTH_SECRET` - Generate with `npx auth secret`
    - `DATABASE_URL` - MySQL connection string (default works with local setup)
 
-4. **Start the database**
+4. **Start the database and storage bucket**
    ```bash
    ./start-database.sh
+   docker-compose up -d
    ```
 
 5. **Set up the database schema**
