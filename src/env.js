@@ -20,6 +20,9 @@ export const env = createEnv({
     MINIO_ACCESS_KEY: z.string().min(1),
     MINIO_SECRET_KEY: z.string().min(1),
     MINIO_BUCKET_NAME: z.string().min(1),
+    REDIS_HOST: z.string().min(1),
+    REDIS_PORT: z.coerce.number().min(1),
+    REDIS_QUEUE_NAME: z.string().min(1),
   },
 
   /**
@@ -44,6 +47,9 @@ export const env = createEnv({
     MINIO_ACCESS_KEY: process.env.MINIO_ACCESS_KEY,
     MINIO_SECRET_KEY: process.env.MINIO_SECRET_KEY,
     MINIO_BUCKET_NAME: process.env.MINIO_BUCKET_NAME,
+    REDIS_HOST: process.env.REDIS_HOST,
+    REDIS_PORT: process.env.REDIS_PORT,
+    REDIS_QUEUE_NAME: process.env.REDIS_QUEUE_NAME,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { resumeQueue } from "~/lib/queue";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 export const applicantRouter = createTRPCRouter({
@@ -48,6 +49,11 @@ export const applicantRouter = createTRPCRouter({
           timezoneScoreAI: 0.0,
           overallScoreAI: 0.0,
         },
+      });
+
+      await resumeQueue.add("process-resume", {
+        applicantId: applicant.id,
+        resumePath: input.resumeFileName,
       });
 
       return { success: true, id: applicant.id };
