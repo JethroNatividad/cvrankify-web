@@ -60,7 +60,13 @@ model Applicant {
     resume    String   @db.Text
     
     // AI Processing Status
-    statusAI String @db.VarChar(50) @default("pending") // "pending", "processing", "completed", "failed"
+    statusAI String @db.VarChar(50) @default("pending") // "pending", "parsing", "processing", "completed", "failed"
+
+    parsedHighestEducationDegree String? @db.VarChar(100)
+    parsedEducationField String? @db.VarChar(100)
+    parsedTimezone String? @db.VarChar(100)
+    parsedSkills String? @db.Text // Comma-separated list
+    parsedYearsOfExperience Int?
 
     // AI Scores - use DECIMAL for consistency with Job weights
     skillsScoreAI     Decimal @db.Decimal(4,2) @default(0.00)
