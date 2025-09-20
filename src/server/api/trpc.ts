@@ -131,3 +131,14 @@ export const protectedProcedure = t.procedure
       },
     });
   });
+
+// This comes from a separate AI backend service
+export const externalAIProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(({ ctx, next }) => {
+    const apiKey = ctx.headers.get("x-api-key");
+    if (apiKey !== process.env.AI_SERVICE_API_KEY) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid API Key" });
+    }
+    return next();
+  });

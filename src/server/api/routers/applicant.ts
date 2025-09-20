@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { resumeQueue } from "~/lib/queue";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  publicProcedure,
+  externalAIProcedure,
+} from "~/server/api/trpc";
 
 export const applicantRouter = createTRPCRouter({
   applyJob: publicProcedure
@@ -57,5 +61,31 @@ export const applicantRouter = createTRPCRouter({
       });
 
       return { success: true, id: applicant.id };
+    }),
+
+  updateStatusAI: externalAIProcedure
+    .input(
+      z.object({
+        applicantId: z.number(),
+        statusAI: z.enum([
+          "pending",
+          "parsing",
+          "processing",
+          "completed",
+          "failed",
+        ]),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const applicant = await ctx.db.applicant.update({
+        where: { id: input.applicantId },
+        data: { statusAI: input.statusAI },
+      });
+
+      if (!applicant) {
+        throw new Error("Applicant not found");
+      }
+
+      return { success: true };
     }),
 });
