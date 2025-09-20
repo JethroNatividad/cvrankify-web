@@ -88,4 +88,34 @@ export const applicantRouter = createTRPCRouter({
 
       return { success: true };
     }),
+
+  updateParsedDataAI: externalAIProcedure
+    .input(
+      z.object({
+        applicantId: z.number(),
+        parsedHighestEducationDegree: z.string().max(100).optional(),
+        parsedEducationField: z.string().max(100).optional(),
+        parsedTimezone: z.string().max(100).optional(),
+        parsedSkills: z.string().optional(), // Comma-separated list
+        parsedYearsOfExperience: z.number().min(0).optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const applicant = await ctx.db.applicant.update({
+        where: { id: input.applicantId },
+        data: {
+          parsedHighestEducationDegree: input.parsedHighestEducationDegree,
+          parsedEducationField: input.parsedEducationField,
+          parsedTimezone: input.parsedTimezone,
+          parsedSkills: input.parsedSkills,
+          parsedYearsOfExperience: input.parsedYearsOfExperience,
+        },
+      });
+
+      if (!applicant) {
+        throw new Error("Applicant not found");
+      }
+
+      return { success: true };
+    }),
 });
