@@ -89,6 +89,40 @@ export const applicantRouter = createTRPCRouter({
       return { success: true };
     }),
 
+  reQueueResumeProcessing: externalAIProcedure
+    .input(
+      z.object({
+        applicantId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const applicant = await ctx.db.applicant.findUnique({
+        where: { id: input.applicantId },
+      });
+
+      if (!applicant) {
+        throw new Error("Applicant not found");
+      }
+
+      if (!applicant.resume) {
+        throw new Error("Applicant does not have a resume on file");
+      }
+
+      // Re-add to the queue
+      await resumeQueue.add("process-resume", {
+        applicantId: applicant.id,
+        resumePath: applicant.resume,
+      });
+
+      // Update statusAI to 'pending' if it was 'failed'
+      await ctx.db.applicant.update({
+        where: { id: applicant.id },
+        data: { statusAI: "pending" },
+      });
+
+      return { success: true };
+    }),
+
   updateParsedDataAI: externalAIProcedure
     .input(
       z.object({
