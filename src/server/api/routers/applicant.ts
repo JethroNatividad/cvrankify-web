@@ -132,23 +132,60 @@ export const applicantRouter = createTRPCRouter({
         parsedTimezone: z.string().max(100).optional(),
         parsedSkills: z.string().optional(), // Comma-separated list
         parsedYearsOfExperience: z.number().min(0).optional(),
+        parsedExperiences: z
+          .array(
+            z.object({
+              jobTitle: z.string().max(255),
+              startYear: z.string(),
+              endYear: z.string().optional(),
+              startMonth: z.string(),
+              endMonth: z.string().optional(),
+              isRelevant: z.boolean().optional(),
+            }),
+          )
+          .optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const applicant = await ctx.db.applicant.update({
-        where: { id: input.applicantId },
-        data: {
-          parsedHighestEducationDegree: input.parsedHighestEducationDegree,
-          parsedEducationField: input.parsedEducationField,
-          parsedTimezone: input.parsedTimezone,
-          parsedSkills: input.parsedSkills,
-          parsedYearsOfExperience: input.parsedYearsOfExperience,
-        },
-      });
+      // Use a transaction to update applicant and create experiences atomically
+      await ctx.db.$transaction(async (tx) => {
+        // Update applicant with parsed data
+        const applicant = await tx.applicant.update({
+          where: { id: input.applicantId },
+          data: {
+            parsedHighestEducationDegree: input.parsedHighestEducationDegree,
+            parsedEducationField: input.parsedEducationField,
+            parsedTimezone: input.parsedTimezone,
+            parsedSkills: input.parsedSkills,
+            parsedYearsOfExperience: input.parsedYearsOfExperience,
+          },
+        });
 
-      if (!applicant) {
-        throw new Error("Applicant not found");
-      }
+        if (!applicant) {
+          throw new Error("Applicant not found");
+        }
+
+        // If experiences are provided, delete old ones and create new ones
+        if (input.parsedExperiences && input.parsedExperiences.length > 0) {
+          // Delete existing experiences for this applicant
+          await tx.experience.deleteMany({
+            where: { applicantId: input.applicantId },
+          });
+
+          // Create new experiences
+          await tx.experience.createMany({
+            data: input.parsedExperiences.map((exp) => ({
+              applicantId: input.applicantId,
+              jobTitle: exp.jobTitle,
+              startYear: exp.startYear,
+              endYear: exp.endYear ?? null,
+              startMonth: exp.startMonth,
+              endMonth: exp.endMonth ?? null,
+              isRelevant: exp.isRelevant ?? false,
+            })),
+          });
+        }
+      });
 
       return { success: true };
     }),

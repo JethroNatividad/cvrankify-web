@@ -90,6 +90,10 @@ model Applicant {
     // Foreign Key
     jobId Int
     job   Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+    
+    // Relations
+    experiences   Experience[]
+    matchedSkills MatchedSkill[]
 
     // Optimized indexes for common queries
     @@index([jobId, interviewStatus]) // Filter by job and status
@@ -97,6 +101,37 @@ model Applicant {
     @@index([statusAI])               // Filter by AI processing status
     @@index([overallScoreAI])         // Sort by score
     @@index([email])                  // Prevent duplicates/lookup
+}
+
+model Experience {
+    id         Int      @id @default(autoincrement())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    jobTitle   String   @db.VarChar(255)
+    startYear  String   @db.VarChar(255)
+    endYear    String?  @db.VarChar(255)
+    startMonth String   @db.VarChar(255)
+    endMonth   String?  @db.VarChar(255)
+    isRelevant Boolean?  @default(false)
+
+    // Relation to Applicant
+    applicantId Int
+    applicant   Applicant @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+}
+
+model MatchedSkill {
+    id             Int      @id @default(autoincrement())
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+    jobSkill       String   @db.VarChar(100)
+    matchType      String   @db.VarChar(50) // "explicit", "implied", "missing"
+    applicantSkill String   @db.VarChar(100)
+    score          Decimal  @db.Decimal(4,2) @default(0.00)
+    reason         String?  @db.Text
+
+    // Relation to Applicant
+    applicantId Int
+    applicant   Applicant @relation(fields: [applicantId], references: [id], onDelete: Cascade)
 }
 
 // Necessary for Next auth
