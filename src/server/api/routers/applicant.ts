@@ -189,4 +189,89 @@ export const applicantRouter = createTRPCRouter({
 
       return { success: true };
     }),
+
+  updateApplicantMatchedSkillsAI: externalAIProcedure
+    .input(
+      z.object({
+        applicantId: z.number(),
+        matchedSkills: z.array(
+          z.object({
+            jobSkill: z.string().max(100),
+            matchType: z.enum(["explicit", "implied", "missing"]),
+            applicantSkill: z.string().max(100),
+            score: z.number().min(0).max(100),
+            reason: z.string().optional(),
+          }),
+        ),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Verify applicant exists
+      const applicant = await ctx.db.applicant.findUnique({
+        where: { id: input.applicantId },
+      });
+
+      if (!applicant) {
+        throw new Error("Applicant not found");
+      }
+
+      // Use a transaction to delete old matched skills and create new ones
+      await ctx.db.$transaction(async (tx) => {
+        // Delete existing matched skills for this applicant
+        await tx.matchedSkill.deleteMany({
+          where: { applicantId: input.applicantId },
+        });
+
+        // Create new matched skills if provided
+        if (input.matchedSkills.length > 0) {
+          await tx.matchedSkill.createMany({
+            data: input.matchedSkills.map((skill) => ({
+              applicantId: input.applicantId,
+              jobSkill: skill.jobSkill,
+              matchType: skill.matchType,
+              applicantSkill: skill.applicantSkill,
+              score: skill.score,
+              reason: skill.reason ?? null,
+            })),
+          });
+        }
+      });
+
+      return { success: true };
+    }),
+
+  queueScoring: externalAIProcedure
+    .input(
+      z.object({
+        applicantId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const applicant = await ctx.db.applicant.findUnique({
+        where: { id: input.applicantId },
+        include: { experiences: true },
+      });
+
+      if (!applicant) {
+        throw new Error("Applicant not found");
+      }
+
+      if (applicant.statusAI !== "processing") {
+        throw new Error("Applicant resume processing is not completed");
+      }
+
+      const job = await ctx.db.job.findUnique({
+        where: { id: applicant.jobId },
+      });
+
+      console.log(applicant);
+
+      await resumeQueue.add("score-applicant", {
+        applicantId: applicant.id,
+        applicantData: JSON.stringify(applicant),
+        jobData: JSON.stringify(job),
+      });
+
+      return { success: true };
+    }),
 });
