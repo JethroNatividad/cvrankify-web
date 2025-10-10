@@ -112,7 +112,7 @@ model Experience {
     endYear    String?  @db.VarChar(255)
     startMonth String   @db.VarChar(255)
     endMonth   String?  @db.VarChar(255)
-    isRelevant Boolean?  @default(false)
+    relevant Boolean?  @default(false)
 
     // Relation to Applicant
     applicantId Int

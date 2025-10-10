@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { id } from "zod/v4/locales";
 import { resumeQueue } from "~/lib/queue";
 import {
   createTRPCRouter,
@@ -140,7 +141,7 @@ export const applicantRouter = createTRPCRouter({
               endYear: z.string().optional(),
               startMonth: z.string(),
               endMonth: z.string().optional(),
-              isRelevant: z.boolean().optional(),
+              relevant: z.boolean().optional(),
             }),
           )
           .optional(),
@@ -181,7 +182,7 @@ export const applicantRouter = createTRPCRouter({
               endYear: exp.endYear ?? null,
               startMonth: exp.startMonth,
               endMonth: exp.endMonth ?? null,
-              isRelevant: exp.isRelevant ?? false,
+              relevant: exp.relevant ?? false,
             })),
           });
         }
@@ -236,6 +237,44 @@ export const applicantRouter = createTRPCRouter({
           });
         }
       });
+
+      return { success: true };
+    }),
+
+  updateApplicantExperienceRelevanceAI: externalAIProcedure
+    .input(
+      z.object({
+        applicantId: z.number(),
+        experiences: z.array(
+          z.object({
+            id: z.number(),
+            relevant: z.boolean(),
+          }),
+        ),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Verify applicant exists
+      const applicant = await ctx.db.applicant.findUnique({
+        where: { id: input.applicantId },
+      });
+
+      if (!applicant) {
+        throw new Error("Applicant not found");
+      }
+
+      // Update each experience's relevant field individually
+      await ctx.db.$transaction(
+        input.experiences.map((exp) =>
+          ctx.db.experience.update({
+            where: {
+              id: exp.id,
+              applicantId: input.applicantId, // Ensure the experience belongs to this applicant
+            },
+            data: { relevant: exp.relevant },
+          }),
+        ),
+      );
 
       return { success: true };
     }),
