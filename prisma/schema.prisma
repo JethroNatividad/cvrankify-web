@@ -69,11 +69,11 @@ model Applicant {
     parsedYearsOfExperience Int?
 
     // AI Scores - use DECIMAL for consistency with Job weights
-    skillsScoreAI     Decimal @db.Decimal(4,2) @default(0.00)
-    experienceScoreAI Decimal @db.Decimal(4,2) @default(0.00)
-    educationScoreAI  Decimal @db.Decimal(4,2) @default(0.00)
-    timezoneScoreAI   Decimal @db.Decimal(4,2) @default(0.00)
-    overallScoreAI    Decimal @db.Decimal(4,2) @default(0.00)
+    skillsScoreAI     Decimal @db.Decimal(6,2) @default(0.00)
+    experienceScoreAI Decimal @db.Decimal(6,2) @default(0.00)
+    educationScoreAI  Decimal @db.Decimal(6,2) @default(0.00)
+    timezoneScoreAI   Decimal @db.Decimal(6,2) @default(0.00)
+    overallScoreAI    Decimal @db.Decimal(6,2) @default(0.00)
 
     // AI Feedback - make nullable to save space when empty
     skillsFeedbackAI     String? @db.Text
