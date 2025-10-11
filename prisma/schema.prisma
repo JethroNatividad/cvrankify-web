@@ -123,9 +123,9 @@ model MatchedSkill {
     id             Int      @id @default(autoincrement())
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
-    jobSkill       String   @db.VarChar(100)
+    jobSkill       String   @db.VarChar(255)
     matchType      String   @db.VarChar(50) // "explicit", "implied", "missing"
-    applicantSkill String   @db.VarChar(100)
+    applicantSkill String   @db.VarChar(255)
     score          Decimal  @db.Decimal(4,2) @default(0.00)
     reason         String?  @db.Text
 
