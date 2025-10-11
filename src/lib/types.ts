@@ -1,4 +1,4 @@
-import type { Applicant, User, Prisma } from "@prisma/client";
+import type { Applicant, Prisma } from "@prisma/client";
 
 export type SerializedApplicant = Omit<
   Applicant,
@@ -15,6 +15,37 @@ export type SerializedApplicant = Omit<
   overallScoreAI: string;
 };
 
+export type ApplicantWithIncludes = Prisma.ApplicantGetPayload<{
+  include: {
+    experiences: true;
+    matchedSkills: true;
+  };
+}>;
+
+export type SerializedMatchedSkill = Omit<
+  Prisma.MatchedSkillGetPayload<Record<string, never>>,
+  "score"
+> & {
+  score: string;
+};
+
+export type SerializedApplicantWithIncludes = Omit<
+  ApplicantWithIncludes,
+  | "skillsScoreAI"
+  | "experienceScoreAI"
+  | "educationScoreAI"
+  | "timezoneScoreAI"
+  | "overallScoreAI"
+  | "matchedSkills"
+> & {
+  skillsScoreAI: string;
+  experienceScoreAI: string;
+  educationScoreAI: string;
+  timezoneScoreAI: string;
+  overallScoreAI: string;
+  matchedSkills: SerializedMatchedSkill[];
+};
+
 export type Job = Prisma.JobGetPayload<{
   include: {
     createdBy: {
@@ -27,15 +58,20 @@ export type Job = Prisma.JobGetPayload<{
 }>;
 
 export type JobWithIncludes = Job & {
-  applicants: SerializedApplicant[];
+  applicants: ApplicantWithIncludes[];
 };
 
 export type SerializedJob = Omit<
   JobWithIncludes,
-  "skillsWeight" | "experienceWeight" | "educationWeight" | "timezoneWeight"
+  | "skillsWeight"
+  | "experienceWeight"
+  | "educationWeight"
+  | "timezoneWeight"
+  | "applicants"
 > & {
   skillsWeight: string;
   experienceWeight: string;
   educationWeight: string;
   timezoneWeight: string;
+  applicants: SerializedApplicantWithIncludes[];
 };

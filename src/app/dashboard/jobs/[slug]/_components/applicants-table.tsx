@@ -17,6 +17,7 @@ import {
   TooltipTrigger,
 } from "~/app/_components/ui/tooltip";
 import type { SerializedJob } from "~/lib/types";
+import ApplicantEvaluationModal from "./applicant-evaluation-modal";
 
 interface ApplicantsTableProps {
   job: SerializedJob;
@@ -33,9 +34,7 @@ function ScoreTooltip({ score, label, feedback, color }: ScoreTooltipProps) {
   if (!feedback) {
     return (
       <div className="text-center">
-        <div className={`text-sm font-medium ${color}`}>
-          {(score * 100).toFixed(0)}%
-        </div>
+        <div className={`text-sm font-medium ${color}`}>{score} pts</div>
         <div className="text-muted-foreground text-xs">{label}</div>
       </div>
     );
@@ -45,9 +44,7 @@ function ScoreTooltip({ score, label, feedback, color }: ScoreTooltipProps) {
     <Tooltip>
       <TooltipTrigger asChild>
         <div className="cursor-help text-center">
-          <div className={`text-sm font-medium ${color}`}>
-            {(score * 100).toFixed(0)}%
-          </div>
+          <div className={`text-sm font-medium ${color}`}>{score} pts</div>
           <div className="text-muted-foreground text-xs">{label}</div>
         </div>
       </TooltipTrigger>
@@ -87,7 +84,17 @@ const formatTimeAgo = (date: Date | string): string => {
   }
 };
 
-export function ApplicantsTable({ job: { applicants } }: ApplicantsTableProps) {
+export function ApplicantsTable({ job }: ApplicantsTableProps) {
+  // Sort applicants by overallScoreAI descending, if null or undefined, treat as 0
+  let { applicants } = job;
+  applicants = applicants
+    ?.slice()
+    .sort(
+      (a, b) =>
+        (parseFloat(b.overallScoreAI?.toString() || "0") || 0) -
+        (parseFloat(a.overallScoreAI?.toString() || "0") || 0),
+    );
+
   if (!applicants?.length) {
     return (
       <div className="rounded-lg border">
@@ -175,11 +182,21 @@ export function ApplicantsTable({ job: { applicants } }: ApplicantsTableProps) {
             </TableHeader>
             <TableBody>
               {applicants.map((applicant) => {
-                const overallScore = parseFloat(applicant.overallScoreAI);
-                const skillsScore = parseFloat(applicant.skillsScoreAI);
-                const experienceScore = parseFloat(applicant.experienceScoreAI);
-                const educationScore = parseFloat(applicant.educationScoreAI);
-                const timezoneScore = parseFloat(applicant.timezoneScoreAI);
+                const overallScore = parseFloat(
+                  applicant.overallScoreAI?.toString() || "0",
+                );
+                const skillsScore = parseFloat(
+                  applicant.skillsScoreAI?.toString() || "0",
+                );
+                const experienceScore = parseFloat(
+                  applicant.experienceScoreAI?.toString() || "0",
+                );
+                const educationScore = parseFloat(
+                  applicant.educationScoreAI?.toString() || "0",
+                );
+                const timezoneScore = parseFloat(
+                  applicant.timezoneScoreAI?.toString() || "0",
+                );
 
                 return (
                   <TableRow key={applicant.id}>
@@ -198,7 +215,7 @@ export function ApplicantsTable({ job: { applicants } }: ApplicantsTableProps) {
                           <TooltipTrigger asChild>
                             <div className="cursor-help text-center">
                               <div className="text-lg font-semibold">
-                                {(overallScore * 100).toFixed(0)}%
+                                {overallScore} pts
                               </div>
                               <div className="text-muted-foreground text-xs">
                                 Overall
@@ -271,6 +288,10 @@ export function ApplicantsTable({ job: { applicants } }: ApplicantsTableProps) {
                             label="Time"
                             feedback={applicant.timezoneFeedbackAI}
                             color="text-orange-600"
+                          />
+                          <ApplicantEvaluationModal
+                            applicant={applicant}
+                            job={job}
                           />
                         </div>
                       ) : (
