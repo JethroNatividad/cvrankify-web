@@ -8,7 +8,6 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "~/app/_components/ui/dialog";
-import { Button } from "~/app/_components/ui/button";
 import { cn } from "~/lib/utils";
 import type {
   SerializedApplicantWithIncludes,
@@ -99,22 +98,26 @@ import type {
 type Props = {
   job: SerializedJob;
   applicant: SerializedApplicantWithIncludes;
+  children: React.ReactNode;
 };
 
-export default function ApplicantEvaluationModal({ job, applicant }: Props) {
+export default function ApplicantEvaluationModal({
+  job,
+  applicant,
+  children,
+}: Props) {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">View AI Evaluation</Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
 
       <DialogContent className="max-h-[85vh] max-w-4xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>AI Evaluation — {applicant.name}</DialogTitle>
+          <DialogTitle>{applicant.email}</DialogTitle>
           <DialogDescription>
-            Transparent breakdown of how this applicant was evaluated by the AI.
+            Detailed evaluation and scoring of applicant against job
+            requirements
           </DialogDescription>
         </DialogHeader>
 

@@ -264,36 +264,37 @@ export function ApplicantsTable({ job }: ApplicantsTableProps) {
 
                     <TableCell>
                       {applicant.statusAI === "completed" ? (
-                        <div className="grid grid-cols-4 gap-2">
-                          <ScoreTooltip
-                            score={skillsScore}
-                            label="Skills"
-                            feedback={applicant.skillsFeedbackAI}
-                            color="text-blue-600"
-                          />
-                          <ScoreTooltip
-                            score={experienceScore}
-                            label="Exp"
-                            feedback={applicant.experienceFeedbackAI}
-                            color="text-green-600"
-                          />
-                          <ScoreTooltip
-                            score={educationScore}
-                            label="Edu"
-                            feedback={applicant.educationFeedbackAI}
-                            color="text-purple-600"
-                          />
-                          <ScoreTooltip
-                            score={timezoneScore}
-                            label="Time"
-                            feedback={applicant.timezoneFeedbackAI}
-                            color="text-orange-600"
-                          />
-                          <ApplicantEvaluationModal
-                            applicant={applicant}
-                            job={job}
-                          />
-                        </div>
+                        <ApplicantEvaluationModal
+                          applicant={applicant}
+                          job={job}
+                        >
+                          <div className="grid cursor-pointer grid-cols-4 gap-2 transition-opacity hover:opacity-70">
+                            <ScoreTooltip
+                              score={skillsScore}
+                              label="Skills"
+                              feedback={applicant.skillsFeedbackAI}
+                              color="text-blue-600"
+                            />
+                            <ScoreTooltip
+                              score={experienceScore}
+                              label="Exp"
+                              feedback={applicant.experienceFeedbackAI}
+                              color="text-green-600"
+                            />
+                            <ScoreTooltip
+                              score={educationScore}
+                              label="Edu"
+                              feedback={applicant.educationFeedbackAI}
+                              color="text-purple-600"
+                            />
+                            <ScoreTooltip
+                              score={timezoneScore}
+                              label="Time"
+                              feedback={applicant.timezoneFeedbackAI}
+                              color="text-orange-600"
+                            />
+                          </div>
+                        </ApplicantEvaluationModal>
                       ) : (
                         <div className="text-muted-foreground text-center text-sm">
                           Processing...
