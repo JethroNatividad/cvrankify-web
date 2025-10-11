@@ -291,6 +291,7 @@ export const applicantRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      console.log("Updating applicant scores:", input);
       const applicant = await ctx.db.applicant.update({
         where: { id: input.applicantId },
         data: {
@@ -335,6 +336,16 @@ export const applicantRouter = createTRPCRouter({
       });
 
       console.log(applicant);
+
+      if (!job) {
+        throw new Error("Associated job not found");
+      }
+
+      // Set statusAI to 'processing'
+      await ctx.db.applicant.update({
+        where: { id: applicant.id },
+        data: { statusAI: "processing" },
+      });
 
       await resumeQueue.add("score-applicant", {
         applicantId: applicant.id,

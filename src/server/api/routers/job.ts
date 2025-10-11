@@ -109,6 +109,9 @@ export const jobRouter = createTRPCRouter({
           educationScoreAI: applicant.educationScoreAI?.toString() ?? "0",
           timezoneScoreAI: applicant.timezoneScoreAI?.toString() ?? "0",
           overallScoreAI: applicant.overallScoreAI?.toString() ?? "0",
+          parsedYearsOfExperience: applicant.parsedYearsOfExperience
+            ? applicant.parsedYearsOfExperience.toString()
+            : undefined,
           matchedSkills: applicant.matchedSkills.map((skill) => ({
             ...skill,
             score: skill.score?.toString() ?? "0",

@@ -7,12 +7,14 @@ export type SerializedApplicant = Omit<
   | "educationScoreAI"
   | "timezoneScoreAI"
   | "overallScoreAI"
+  | "parsedYearsOfExperience"
 > & {
   skillsScoreAI: string;
   experienceScoreAI: string;
   educationScoreAI: string;
   timezoneScoreAI: string;
   overallScoreAI: string;
+  parsedYearsOfExperience?: string;
 };
 
 export type ApplicantWithIncludes = Prisma.ApplicantGetPayload<{
@@ -37,12 +39,14 @@ export type SerializedApplicantWithIncludes = Omit<
   | "timezoneScoreAI"
   | "overallScoreAI"
   | "matchedSkills"
+  | "parsedYearsOfExperience"
 > & {
   skillsScoreAI: string;
   experienceScoreAI: string;
   educationScoreAI: string;
   timezoneScoreAI: string;
   overallScoreAI: string;
+  parsedYearsOfExperience?: string;
   matchedSkills: SerializedMatchedSkill[];
 };
 
