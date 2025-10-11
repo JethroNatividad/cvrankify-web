@@ -196,10 +196,10 @@ export const applicantRouter = createTRPCRouter({
         applicantId: z.number(),
         matchedSkills: z.array(
           z.object({
-            jobSkill: z.string().max(100),
+            jobSkill: z.string().max(255),
             matchType: z.enum(["explicit", "implied", "missing"]),
-            applicantSkill: z.string().max(100),
-            score: z.number().min(0).max(100),
+            applicantSkill: z.string().max(255),
+            score: z.number().min(0),
             reason: z.string().optional(),
           }),
         ),
