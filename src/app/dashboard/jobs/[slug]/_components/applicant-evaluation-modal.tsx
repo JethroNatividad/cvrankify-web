@@ -172,13 +172,13 @@ export default function ApplicantEvaluationModal({ job, applicant }: Props) {
                     className={cn(
                       "text-sm",
                       applicant.parsedYearsOfExperience !== null &&
-                        applicant.parsedYearsOfExperience >=
+                        Number(applicant.parsedYearsOfExperience) >=
                           job.yearsOfExperience
                         ? "font-medium text-green-600"
                         : "text-red-600",
                     )}
                   >
-                    {applicant.parsedYearsOfExperience ?? 0} years
+                    {Number(applicant.parsedYearsOfExperience ?? 0)} years
                   </span>
                 </div>
 
@@ -269,7 +269,7 @@ export default function ApplicantEvaluationModal({ job, applicant }: Props) {
               </h3>
               <div className="flex items-center gap-3">
                 <span className="text-muted-foreground text-xs">
-                  Total: {applicant.parsedYearsOfExperience} years
+                  Total: {Number(applicant.parsedYearsOfExperience ?? 0)} years
                 </span>
                 <span className="text-primary text-sm font-semibold">
                   {applicant.experienceScoreAI.toString()} pts
