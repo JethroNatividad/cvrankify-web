@@ -278,6 +278,38 @@ export const applicantRouter = createTRPCRouter({
       return { success: true };
     }),
 
+  updateApplicantScoresAI: externalAIProcedure
+    .input(
+      z.object({
+        applicantId: z.number(),
+        skillsScoreAI: z.number().min(0),
+        experienceScoreAI: z.number().min(0),
+        educationScoreAI: z.number().min(0),
+        timezoneScoreAI: z.number().min(0),
+        overallScoreAI: z.number().min(0),
+        parsedYearsOfExperience: z.number().min(0).optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const applicant = await ctx.db.applicant.update({
+        where: { id: input.applicantId },
+        data: {
+          skillsScoreAI: input.skillsScoreAI,
+          experienceScoreAI: input.experienceScoreAI,
+          educationScoreAI: input.educationScoreAI,
+          timezoneScoreAI: input.timezoneScoreAI,
+          overallScoreAI: input.overallScoreAI,
+          parsedYearsOfExperience: input.parsedYearsOfExperience,
+        },
+      });
+
+      if (!applicant) {
+        throw new Error("Applicant not found");
+      }
+
+      return { success: true };
+    }),
+
   queueScoring: externalAIProcedure
     .input(
       z.object({
@@ -294,7 +326,7 @@ export const applicantRouter = createTRPCRouter({
         throw new Error("Applicant not found");
       }
 
-      if (applicant.statusAI !== "processing") {
+      if (applicant.statusAI == "pending") {
         throw new Error("Applicant resume processing is not completed");
       }
 
