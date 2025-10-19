@@ -16,6 +16,7 @@ import {
   UsersIcon,
   GraduationCapIcon,
   BriefcaseIcon,
+  HomeIcon,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -35,6 +36,9 @@ interface JobCardProps {
     interviewsNeeded: number;
     hires: number;
     hiresNeeded: number;
+    employmentType: string;
+    workplaceType: string;
+    location: string;
     _count: {
       applicants: number;
     };
@@ -53,6 +57,20 @@ export default function JobCard({ job }: JobCardProps) {
             <CardDescription className="line-clamp-2">
               {job.description}
             </CardDescription>
+            <div className="flex flex-wrap items-center gap-2 pt-2">
+              <Badge variant="outline" className="text-xs">
+                <BriefcaseIcon className="mr-1 h-3 w-3" />
+                {job.employmentType}
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                <HomeIcon className="mr-1 h-3 w-3" />
+                {job.workplaceType}
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                <MapPinIcon className="mr-1 h-3 w-3" />
+                {job.location}
+              </Badge>
+            </div>
           </div>
           <Badge variant={job.isOpen ? "default" : "secondary"}>
             {job.isOpen ? "Open" : "Closed"}
@@ -81,8 +99,8 @@ export default function JobCard({ job }: JobCardProps) {
         {/* Job Requirements */}
         <div className="text-muted-foreground grid grid-cols-2 gap-3 text-sm">
           <div className="flex items-center gap-2">
-            <BriefcaseIcon className="h-4 w-4" />
-            <span>{job.yearsOfExperience}+ years</span>
+            <UsersIcon className="h-4 w-4" />
+            <span>{job.yearsOfExperience}+ years exp</span>
           </div>
 
           <div className="flex items-center gap-2">

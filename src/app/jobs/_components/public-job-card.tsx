@@ -11,6 +11,8 @@ import {
   Users,
   Building,
   Eye,
+  Briefcase,
+  Home,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -26,6 +28,10 @@ interface PublicJobCardProps {
     hires: number;
     hiresNeeded: number;
     createdAt: Date;
+    employmentType: string;
+    workplaceType: string;
+    location: string;
+    salaryRange?: string | null;
     createdBy: {
       name: string | null;
     };
@@ -49,6 +55,20 @@ const PublicJobCard = ({ job }: PublicJobCardProps) => {
             <div className="text-muted-foreground mt-1 flex items-center gap-2 text-sm">
               <Building className="h-3 w-3" />
               <span>{job.createdBy.name ?? "Anonymous"}</span>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <Badge variant="secondary" className="text-xs">
+                <Briefcase className="mr-1 h-3 w-3" />
+                {job.employmentType}
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                <Home className="mr-1 h-3 w-3" />
+                {job.workplaceType}
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                <MapPin className="mr-1 h-3 w-3" />
+                {job.location}
+              </Badge>
             </div>
           </div>
           <Badge variant="default" className="ml-2 shrink-0">
@@ -110,6 +130,16 @@ const PublicJobCard = ({ job }: PublicJobCardProps) => {
             )}
           </div>
         </div>
+
+        {/* Salary Range */}
+        {job.salaryRange && (
+          <div className="space-y-2">
+            <h4 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+              Salary Range
+            </h4>
+            <p className="text-sm font-medium">{job.salaryRange}</p>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="text-muted-foreground flex items-center justify-between border-t pt-3 text-xs">

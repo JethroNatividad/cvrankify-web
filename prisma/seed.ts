@@ -49,6 +49,18 @@ We offer competitive compensation, flexible working arrangements, and opportunit
       interviewsNeeded: 3,
       hiresNeeded: 2,
       isOpen: true,
+      employmentType: "Full-time",
+      workplaceType: "Remote",
+      location: "Remote - Global",
+      qualifications:
+        "5+ years of experience in full-stack development, strong proficiency in React, TypeScript, Node.js, and PostgreSQL. Experience with cloud platforms (AWS preferred), containerization (Docker), and modern development practices. Bachelor's degree in Computer Science or related field.",
+      preferredQualifications:
+        "Experience with GraphQL, Next.js, Python, Redis. Familiarity with microservices architecture, CI/CD pipelines, and agile development methodologies. Contributions to open-source projects.",
+      industry: "Information Technology",
+      jobFunction: "Engineering",
+      benefits:
+        "Competitive salary, health insurance, flexible working hours, remote work options, professional development budget, annual performance bonuses, unlimited PTO.",
+      salaryRange: "$100,000 - $150,000 annually",
     },
     {
       title: "Product Manager - SaaS Platform",
@@ -79,6 +91,18 @@ This is an excellent opportunity to shape the future of our product and make a s
       interviewsNeeded: 2,
       hiresNeeded: 1,
       isOpen: true,
+      employmentType: "Full-time",
+      workplaceType: "Hybrid",
+      location: "New York, NY",
+      qualifications:
+        "4+ years of product management experience in SaaS or technology companies. Strong understanding of agile methodologies, user research techniques, and data analysis. Experience with tools like Jira, Figma, and SQL. Master's degree in Business Administration or related field preferred.",
+      preferredQualifications:
+        "MBA degree, experience in B2B SaaS products, technical background or engineering degree, familiarity with A/B testing frameworks, experience with roadmap planning tools.",
+      industry: "Software Development",
+      jobFunction: "Product Management",
+      benefits:
+        "Competitive salary and equity, comprehensive health benefits, 401(k) matching, flexible work arrangements, professional development opportunities, team events and offsites.",
+      salaryRange: "$120,000 - $160,000 annually",
     },
     {
       title: "DevOps Engineer",
@@ -109,6 +133,18 @@ We offer opportunities to work with cutting-edge technologies and contribute to 
       interviewsNeeded: 2,
       hiresNeeded: 1,
       isOpen: true,
+      employmentType: "Full-time",
+      workplaceType: "Remote",
+      location: "Remote - Europe",
+      qualifications:
+        "3+ years of experience in DevOps or Site Reliability Engineering. Strong expertise in Kubernetes, Docker, and cloud platforms (AWS/Azure/GCP). Proficiency in infrastructure as code tools (Terraform), CI/CD pipelines (Jenkins), and scripting languages (Bash, Python). Bachelor's degree in Computer Engineering or related field.",
+      preferredQualifications:
+        "AWS/Azure/GCP certifications, experience with Ansible, familiarity with service mesh (Istio), knowledge of security best practices, experience with GitOps workflows.",
+      industry: "Information Technology",
+      jobFunction: "DevOps",
+      benefits:
+        "Competitive compensation, remote work flexibility, health and dental insurance, learning and certification budget, home office stipend, annual company retreats.",
+      salaryRange: "$90,000 - $130,000 annually",
     },
     {
       title: "Senior UX/UI Designer",
@@ -139,6 +175,18 @@ Join our team to create beautiful, functional designs that solve real user probl
       interviewsNeeded: 3,
       hiresNeeded: 1,
       isOpen: true,
+      employmentType: "Full-time",
+      workplaceType: "Hybrid",
+      location: "San Francisco, CA",
+      qualifications:
+        "4+ years of experience in UX/UI design. Proficiency in design tools like Figma, Sketch, and Adobe Creative Suite. Strong portfolio demonstrating user-centered design process. Experience with user research methodologies and usability testing. Understanding of HTML, CSS, and JavaScript. Bachelor's degree in Design, HCI, or related field.",
+      preferredQualifications:
+        "Experience designing for mobile platforms (iOS/Android), knowledge of accessibility standards (WCAG), motion design skills, familiarity with design tokens and design systems at scale.",
+      industry: "Software Development",
+      jobFunction: "Design",
+      benefits:
+        "Competitive salary, equity package, comprehensive health coverage, flexible PTO, gym membership, professional development budget, hybrid work model with flexible hours.",
+      salaryRange: "$95,000 - $135,000 annually",
     },
     {
       title: "Data Scientist",
@@ -170,6 +218,18 @@ This is an excellent opportunity to work with cutting-edge data science technolo
       interviewsNeeded: 2,
       hiresNeeded: 1,
       isOpen: true,
+      employmentType: "Full-time",
+      workplaceType: "Remote",
+      location: "Remote - Europe/Africa",
+      qualifications:
+        "3+ years of experience in data science or machine learning. Strong programming skills in Python and R. Proficiency in SQL and experience with big data technologies. Expertise in machine learning frameworks (TensorFlow, PyTorch, scikit-learn). Master's degree in Data Science, Statistics, Computer Science, or related quantitative field.",
+      preferredQualifications:
+        "PhD in a quantitative field, experience with deep learning and NLP, familiarity with cloud platforms (AWS/GCP/Azure), knowledge of Spark and distributed computing, publications in data science conferences.",
+      industry: "Data Analytics",
+      jobFunction: "Data Science",
+      benefits:
+        "Competitive salary, remote work flexibility, health insurance, learning and conference budget, latest hardware and software, flexible working hours, annual team offsites.",
+      salaryRange: "$85,000 - $125,000 annually",
     },
     {
       title: "Frontend Developer",
@@ -200,6 +260,18 @@ Join our team to work on innovative projects and contribute to products that are
       interviewsNeeded: 2,
       hiresNeeded: 2,
       isOpen: true,
+      employmentType: "Full-time",
+      workplaceType: "Remote",
+      location: "Remote - Philippines",
+      qualifications:
+        "2+ years of professional frontend development experience. Strong proficiency in React, TypeScript, and modern JavaScript (ES6+). Solid understanding of HTML5, CSS3, and responsive design principles. Experience with modern CSS frameworks (Tailwind CSS preferred). Familiarity with version control (Git). Bachelor's degree in Computer Science or equivalent experience.",
+      preferredQualifications:
+        "Experience with Next.js or other React frameworks, knowledge of testing frameworks (Jest, React Testing Library), familiarity with state management libraries (Redux, Zustand), understanding of web performance optimization techniques.",
+      industry: "Software Development",
+      jobFunction: "Engineering",
+      benefits:
+        "Competitive salary, work-from-home setup, HMO coverage with dependents, paid time off, learning and development allowance, internet and electricity allowance, performance bonuses.",
+      salaryRange: "₱60,000 - ₱90,000 monthly",
     },
   ];
 

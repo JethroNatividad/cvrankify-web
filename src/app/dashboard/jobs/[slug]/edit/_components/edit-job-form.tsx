@@ -72,6 +72,17 @@ const formSchema = z
       .min(1, "At least 1 hire is needed")
       .max(50, "Too many hires"),
     isOpen: z.boolean().optional(),
+    // New required fields
+    employmentType: z.enum(["Full-time", "Part-time", "Contract", "Internship"]),
+    workplaceType: z.enum(["Remote", "Hybrid", "On-site"]),
+    location: z.string().min(1, "Location is required").max(255, "Location is too long"),
+    qualifications: z.string().min(1, "Qualifications are required"),
+    // New optional fields
+    preferredQualifications: z.string().optional(),
+    industry: z.string().max(100, "Industry is too long").optional(),
+    jobFunction: z.string().max(100, "Job function is too long").optional(),
+    benefits: z.string().optional(),
+    salaryRange: z.string().max(100, "Salary range is too long").optional(),
   })
   .refine(
     (data) => {
@@ -119,6 +130,15 @@ const EditJobForm = ({ job }: EditJobFormProps) => {
       interviewsNeeded: job.interviewsNeeded,
       hiresNeeded: job.hiresNeeded,
       isOpen: job.isOpen,
+      employmentType: (job as any).employmentType as "Full-time" | "Part-time" | "Contract" | "Internship",
+      workplaceType: (job as any).workplaceType as "Remote" | "Hybrid" | "On-site",
+      location: (job as any).location,
+      qualifications: (job as any).qualifications,
+      preferredQualifications: (job as any).preferredQualifications ?? "",
+      industry: (job as any).industry ?? "",
+      jobFunction: (job as any).jobFunction ?? "",
+      benefits: (job as any).benefits ?? "",
+      salaryRange: (job as any).salaryRange ?? "",
     },
   });
 
@@ -165,6 +185,15 @@ const EditJobForm = ({ job }: EditJobFormProps) => {
         interviewsNeeded: job.interviewsNeeded,
         hiresNeeded: job.hiresNeeded,
         isOpen: job.isOpen,
+        employmentType: (job as any).employmentType as "Full-time" | "Part-time" | "Contract" | "Internship",
+        workplaceType: (job as any).workplaceType as "Remote" | "Hybrid" | "On-site",
+        location: (job as any).location,
+        qualifications: (job as any).qualifications,
+        preferredQualifications: (job as any).preferredQualifications ?? "",
+        industry: (job as any).industry ?? "",
+        jobFunction: (job as any).jobFunction ?? "",
+        benefits: (job as any).benefits ?? "",
+        salaryRange: (job as any).salaryRange ?? "",
       });
     }
   }, [job, form]);
@@ -242,6 +271,202 @@ const EditJobForm = ({ job }: EditJobFormProps) => {
                 <FormDescription>
                   Type skills and press Enter or comma to add them. Click X to
                   remove.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <FormField
+              control={form.control}
+              name="employmentType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Employment Type</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select employment type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Full-time">Full-time</SelectItem>
+                        <SelectItem value="Part-time">Part-time</SelectItem>
+                        <SelectItem value="Contract">Contract</SelectItem>
+                        <SelectItem value="Internship">Internship</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormDescription>Type of employment</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="workplaceType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Workplace Type</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select workplace type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Remote">Remote</SelectItem>
+                        <SelectItem value="Hybrid">Hybrid</SelectItem>
+                        <SelectItem value="On-site">On-site</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormDescription>Work arrangement</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Location</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g., Remote - Philippines"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>Job location or region</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="qualifications"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Qualifications / Requirements</FormLabel>
+                <FormControl>
+                  <textarea
+                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[120px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                    placeholder="List required qualifications, skills, tools, education requirements..."
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Required skills, tools, education, and other qualifications
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="preferredQualifications"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Preferred Qualifications (Optional)</FormLabel>
+                <FormControl>
+                  <textarea
+                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[100px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                    placeholder="List bonus skills, certifications, or nice-to-have qualifications..."
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Bonus skills and qualifications that would be advantageous
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="industry"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Industry (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g., Information Technology, Healthcare"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>Industry sector</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="jobFunction"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Job Function (Optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g., Engineering, Development, QA"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>Primary job function</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="benefits"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Benefits (Optional)</FormLabel>
+                <FormControl>
+                  <textarea
+                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[100px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                    placeholder="List benefits such as health insurance, flexible hours, PTO, etc..."
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Benefits and perks offered with this position
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="salaryRange"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Salary Range (Optional)</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g., $50,000 - $70,000 annually or Not disclosed"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Salary range or indicate if not disclosed
                 </FormDescription>
                 <FormMessage />
               </FormItem>

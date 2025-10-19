@@ -11,6 +11,12 @@ import {
   Building,
   Calendar,
   ArrowLeft,
+  Briefcase,
+  Home,
+  DollarSign,
+  Building2,
+  Target,
+  Gift,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -57,7 +63,21 @@ const PublicJobPage = async ({ params }: PublicJobPageProps) => {
             <div className="mb-4 flex items-start justify-between">
               <div className="flex-1">
                 <h1 className="text-3xl font-bold">{job.title}</h1>
-                <div className="text-muted-foreground mt-2 flex items-center gap-3">
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Badge variant="secondary" className="text-sm">
+                    <Briefcase className="mr-1 h-4 w-4" />
+                    {(job as any).employmentType}
+                  </Badge>
+                  <Badge variant="secondary" className="text-sm">
+                    <Home className="mr-1 h-4 w-4" />
+                    {(job as any).workplaceType}
+                  </Badge>
+                  <Badge variant="secondary" className="text-sm">
+                    <MapPin className="mr-1 h-4 w-4" />
+                    {(job as any).location}
+                  </Badge>
+                </div>
+                <div className="text-muted-foreground mt-3 flex items-center gap-3">
                   <div className="flex items-center gap-1">
                     <Building className="h-4 w-4" />
                     <span>{job.createdBy.name ?? "Anonymous Company"}</span>
@@ -146,7 +166,7 @@ const PublicJobPage = async ({ params }: PublicJobPageProps) => {
                     <MapPin className="h-5 w-5 text-purple-600" />
                   </div>
                   <div>
-                    <div className="font-medium">Location</div>
+                    <div className="font-medium">Timezone</div>
                     <div className="text-muted-foreground text-sm">
                       {job.timezone} timezone
                     </div>
@@ -167,6 +187,57 @@ const PublicJobPage = async ({ params }: PublicJobPageProps) => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Qualifications */}
+          {(job as any).qualifications && (
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-semibold">Qualifications</h2>
+              </CardHeader>
+              <CardContent>
+                <div className="prose prose-sm max-w-none">
+                  <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                    {(job as any).qualifications}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Preferred Qualifications */}
+          {(job as any).preferredQualifications && (
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-semibold">Preferred Qualifications</h2>
+              </CardHeader>
+              <CardContent>
+                <div className="prose prose-sm max-w-none">
+                  <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                    {(job as any).preferredQualifications}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Benefits */}
+          {(job as any).benefits && (
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-semibold">
+                  <Gift className="mr-2 inline h-5 w-5 text-amber-500" />
+                  Benefits & Perks
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <div className="prose prose-sm max-w-none">
+                  <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                    {(job as any).benefits}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -199,6 +270,50 @@ const PublicJobPage = async ({ params }: PublicJobPageProps) => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Additional Job Info */}
+          {((job as any).industry || (job as any).jobFunction || (job as any).salaryRange) && (
+            <Card>
+              <CardHeader>
+                <h3 className="text-lg font-semibold">Job Details</h3>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {(job as any).industry && (
+                  <div className="flex items-start gap-3">
+                    <Building2 className="mt-0.5 h-5 w-5 text-indigo-500" />
+                    <div>
+                      <div className="text-sm font-medium">Industry</div>
+                      <div className="text-muted-foreground text-sm">
+                        {(job as any).industry}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {(job as any).jobFunction && (
+                  <div className="flex items-start gap-3">
+                    <Target className="mt-0.5 h-5 w-5 text-pink-500" />
+                    <div>
+                      <div className="text-sm font-medium">Job Function</div>
+                      <div className="text-muted-foreground text-sm">
+                        {(job as any).jobFunction}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {(job as any).salaryRange && (
+                  <div className="flex items-start gap-3">
+                    <DollarSign className="mt-0.5 h-5 w-5 text-emerald-500" />
+                    <div>
+                      <div className="text-sm font-medium">Salary Range</div>
+                      <div className="text-muted-foreground text-sm font-medium">
+                        {(job as any).salaryRange}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Apply Section */}
           <ApplyForm jobId={jobId} jobTitle={job.title} />

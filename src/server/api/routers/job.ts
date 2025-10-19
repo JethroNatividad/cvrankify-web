@@ -23,6 +23,17 @@ export const jobRouter = createTRPCRouter({
         timezoneWeight: z.number().min(0).max(1),
         interviewsNeeded: z.number().min(1).max(10),
         hiresNeeded: z.number().min(1).max(50),
+        // New required fields
+        employmentType: z.enum(["Full-time", "Part-time", "Contract", "Internship"]),
+        workplaceType: z.enum(["Remote", "Hybrid", "On-site"]),
+        location: z.string().min(1).max(255),
+        qualifications: z.string().min(1),
+        // New optional fields
+        preferredQualifications: z.string().optional(),
+        industry: z.string().max(100).optional(),
+        jobFunction: z.string().max(100).optional(),
+        benefits: z.string().optional(),
+        salaryRange: z.string().max(100).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -41,6 +52,15 @@ export const jobRouter = createTRPCRouter({
           timezoneWeight: input.timezoneWeight,
           interviewsNeeded: input.interviewsNeeded,
           hiresNeeded: input.hiresNeeded,
+          employmentType: input.employmentType,
+          workplaceType: input.workplaceType,
+          location: input.location,
+          qualifications: input.qualifications,
+          preferredQualifications: input.preferredQualifications,
+          industry: input.industry,
+          jobFunction: input.jobFunction,
+          benefits: input.benefits,
+          salaryRange: input.salaryRange,
           createdBy: { connect: { id: ctx.session.user.id } },
         },
       });
@@ -140,6 +160,17 @@ export const jobRouter = createTRPCRouter({
         interviewsNeeded: z.number().min(1).max(10),
         hiresNeeded: z.number().min(1).max(50),
         isOpen: z.boolean().optional(),
+        // New required fields
+        employmentType: z.enum(["Full-time", "Part-time", "Contract", "Internship"]),
+        workplaceType: z.enum(["Remote", "Hybrid", "On-site"]),
+        location: z.string().min(1).max(255),
+        qualifications: z.string().min(1),
+        // New optional fields
+        preferredQualifications: z.string().optional(),
+        industry: z.string().max(100).optional(),
+        jobFunction: z.string().max(100).optional(),
+        benefits: z.string().optional(),
+        salaryRange: z.string().max(100).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
