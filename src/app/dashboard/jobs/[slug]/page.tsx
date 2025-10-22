@@ -134,18 +134,18 @@ const JobPage = async ({ params }: JobPageProps) => {
                 {job.isOpen ? "Open" : "Closed"}
               </Badge>
             </div>
-            <div className="flex flex-wrap items-center gap-2 mb-2">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
               <Badge variant="outline" className="text-xs">
                 <Briefcase className="mr-1 h-3 w-3" />
-                {(job as any).employmentType}
+                {job.employmentType}
               </Badge>
               <Badge variant="outline" className="text-xs">
                 <Home className="mr-1 h-3 w-3" />
-                {(job as any).workplaceType}
+                {job.workplaceType}
               </Badge>
               <Badge variant="outline" className="text-xs">
                 <MapPin className="mr-1 h-3 w-3" />
-                {(job as any).location}
+                {job.location}
               </Badge>
             </div>
             <p className="text-muted-foreground">
@@ -308,26 +308,26 @@ const JobPage = async ({ params }: JobPageProps) => {
                 </div>
 
                 {/* Qualifications */}
-                {(job as any).qualifications && (
+                {job.qualifications && (
                   <div>
                     <h4 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
                       Required Qualifications
                     </h4>
                     <ExpandableDescription
-                      description={(job as any).qualifications}
+                      description={job.qualifications}
                       maxLength={200}
                     />
                   </div>
                 )}
 
                 {/* Preferred Qualifications */}
-                {(job as any).preferredQualifications && (
+                {job.preferredQualifications && (
                   <div>
                     <h4 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
                       Preferred Qualifications
                     </h4>
                     <ExpandableDescription
-                      description={(job as any).preferredQualifications}
+                      description={job.preferredQualifications}
                       maxLength={200}
                     />
                   </div>
@@ -335,52 +335,54 @@ const JobPage = async ({ params }: JobPageProps) => {
 
                 {/* Additional Info Grid */}
                 <div className="grid grid-cols-2 gap-4 pt-2">
-                  {(job as any).industry && (
+                  {job.industry && (
                     <div className="space-y-1">
                       <h4 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                         Industry
                       </h4>
                       <div className="flex items-center gap-2">
                         <Building2 className="h-3.5 w-3.5 text-indigo-500" />
-                        <span className="text-sm">{(job as any).industry}</span>
+                        <span className="text-sm">{job.industry}</span>
                       </div>
                     </div>
                   )}
 
-                  {(job as any).jobFunction && (
+                  {job.jobFunction && (
                     <div className="space-y-1">
                       <h4 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                         Job Function
                       </h4>
                       <div className="flex items-center gap-2">
                         <Target className="h-3.5 w-3.5 text-pink-500" />
-                        <span className="text-sm">{(job as any).jobFunction}</span>
+                        <span className="text-sm">{job.jobFunction}</span>
                       </div>
                     </div>
                   )}
 
-                  {(job as any).salaryRange && (
+                  {job.salaryRange && (
                     <div className="space-y-1">
                       <h4 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                         Salary Range
                       </h4>
                       <div className="flex items-center gap-2">
                         <DollarSign className="h-3.5 w-3.5 text-emerald-500" />
-                        <span className="text-sm font-medium">{(job as any).salaryRange}</span>
+                        <span className="text-sm font-medium">
+                          {job.salaryRange}
+                        </span>
                       </div>
                     </div>
                   )}
                 </div>
 
                 {/* Benefits */}
-                {(job as any).benefits && (
+                {job.benefits && (
                   <div>
                     <h4 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
                       <Gift className="mr-1 inline h-3.5 w-3.5 text-amber-500" />
                       Benefits & Perks
                     </h4>
                     <ExpandableDescription
-                      description={(job as any).benefits}
+                      description={job.benefits}
                       maxLength={200}
                     />
                   </div>
