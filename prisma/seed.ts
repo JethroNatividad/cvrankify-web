@@ -51,7 +51,7 @@ We offer competitive compensation, flexible working arrangements, and opportunit
       isOpen: true,
       employmentType: "Full-time",
       workplaceType: "Remote",
-      location: "Remote - Global",
+      location: null, // Remote job doesn't need a specific location
       benefits:
         "Competitive salary, health insurance, flexible working hours, remote work options, professional development budget, annual performance bonuses, unlimited PTO.",
       salaryType: "RANGE",

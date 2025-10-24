@@ -86,10 +86,7 @@ const formSchema = z
       "Internship",
     ]),
     workplaceType: z.enum(["Remote", "Hybrid", "On-site"]),
-    location: z
-      .string()
-      .min(1, "Location is required")
-      .max(255, "Location is too long"),
+    location: z.string().max(255, "Location is too long").optional(),
     // New optional fields
     benefits: z.string().optional(),
     // Salary fields
@@ -111,6 +108,19 @@ const formSchema = z
     {
       message: "All weights must sum to 1.00",
       path: ["skillsWeight"],
+    },
+  )
+  .refine(
+    (data) => {
+      // Location is required for Hybrid and On-site workplace types
+      if (data.workplaceType === "Hybrid" || data.workplaceType === "On-site") {
+        return data.location !== undefined && data.location.length > 0;
+      }
+      return true;
+    },
+    {
+      message: "Location is required for Hybrid and On-site workplace types",
+      path: ["location"],
     },
   )
   .refine(
@@ -200,7 +210,7 @@ const EditJobForm = ({ job }: EditJobFormProps) => {
         | "Contract"
         | "Internship",
       workplaceType: job.workplaceType as "Remote" | "Hybrid" | "On-site",
-      location: job.location,
+      location: job.location ?? undefined,
       benefits: job.benefits ?? "",
       salaryType:
         (job.salaryType as "FIXED" | "RANGE" | undefined) ?? undefined,
@@ -264,7 +274,7 @@ const EditJobForm = ({ job }: EditJobFormProps) => {
           | "Contract"
           | "Internship",
         workplaceType: job.workplaceType as "Remote" | "Hybrid" | "On-site",
-        location: job.location,
+        location: job.location ?? undefined,
         benefits: job.benefits ?? "",
         salaryType:
           (job.salaryType as "FIXED" | "RANGE" | undefined) ?? undefined,

@@ -84,10 +84,7 @@ const formSchema = z
       "Internship",
     ]),
     workplaceType: z.enum(["Remote", "Hybrid", "On-site"]),
-    location: z
-      .string()
-      .min(1, "Location is required")
-      .max(255, "Location is too long"),
+    location: z.string().max(255, "Location is too long").optional(),
     // New optional fields
     benefits: z.string().optional(),
     // Salary fields
@@ -109,6 +106,19 @@ const formSchema = z
     {
       message: "All weights must sum to 1.00",
       path: ["skillsWeight"],
+    },
+  )
+  .refine(
+    (data) => {
+      // Location is required for Hybrid and On-site workplace types
+      if (data.workplaceType === "Hybrid" || data.workplaceType === "On-site") {
+        return data.location !== undefined && data.location.length > 0;
+      }
+      return true;
+    },
+    {
+      message: "Location is required for Hybrid and On-site workplace types",
+      path: ["location"],
     },
   )
   .refine(
@@ -201,6 +211,11 @@ const CreateJobForm = () => {
       toast.error(error.message);
     },
   });
+
+  // Watch for workplace type to conditionally show location field
+  const workplaceType = form.watch("workplaceType");
+  // Watch for salary type to conditionally show salary fields
+  const salaryType = form.watch("salaryType");
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Convert skills array to string for database storage
@@ -336,23 +351,29 @@ const CreateJobForm = () => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g., Remote - Philippines"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>Job location or region</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {(workplaceType === "Hybrid" || workplaceType === "On-site") && (
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Location <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., San Francisco, CA or New York, NY"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Physical location where the employee will work
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </div>
 
           <FormField

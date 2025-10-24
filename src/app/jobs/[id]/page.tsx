@@ -284,6 +284,8 @@ const PublicJobPage = async ({ params }: PublicJobPageProps) => {
             jobTitle={job.title}
             salaryType={job.salaryType}
             salaryCurrency={job.salaryCurrency}
+            workplaceType={job.workplaceType}
+            jobLocation={job.location}
           />
 
           {/* Company Info */}

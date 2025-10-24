@@ -32,7 +32,7 @@ export const jobRouter = createTRPCRouter({
             "Internship",
           ]),
           workplaceType: z.enum(["Remote", "Hybrid", "On-site"]),
-          location: z.string().min(1).max(255),
+          location: z.string().min(1).max(255).optional(),
           // New optional fields
           benefits: z.string().optional(),
           // Salary fields
@@ -42,6 +42,23 @@ export const jobRouter = createTRPCRouter({
           salaryRangeMax: z.number().positive().optional(),
           salaryCurrency: z.string().max(10).optional().default("USD"),
         })
+        .refine(
+          (data) => {
+            // Location is required for Hybrid and On-site workplace types
+            if (
+              data.workplaceType === "Hybrid" ||
+              data.workplaceType === "On-site"
+            ) {
+              return data.location !== undefined && data.location.length > 0;
+            }
+            return true;
+          },
+          {
+            message:
+              "Location is required for Hybrid and On-site workplace types",
+            path: ["location"],
+          },
+        )
         .refine(
           (data) => {
             // If salaryType is FIXED, fixedSalary must be provided
@@ -240,7 +257,7 @@ export const jobRouter = createTRPCRouter({
             "Internship",
           ]),
           workplaceType: z.enum(["Remote", "Hybrid", "On-site"]),
-          location: z.string().min(1).max(255),
+          location: z.string().min(1).max(255).optional(),
           // New optional fields
           benefits: z.string().optional(),
           // Salary fields
@@ -250,6 +267,23 @@ export const jobRouter = createTRPCRouter({
           salaryRangeMax: z.number().positive().optional(),
           salaryCurrency: z.string().max(10).optional().default("USD"),
         })
+        .refine(
+          (data) => {
+            // Location is required for Hybrid and On-site workplace types
+            if (
+              data.workplaceType === "Hybrid" ||
+              data.workplaceType === "On-site"
+            ) {
+              return data.location !== undefined && data.location.length > 0;
+            }
+            return true;
+          },
+          {
+            message:
+              "Location is required for Hybrid and On-site workplace types",
+            path: ["location"],
+          },
+        )
         .refine(
           (data) => {
             // If salaryType is FIXED, fixedSalary must be provided

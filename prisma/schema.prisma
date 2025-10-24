@@ -29,7 +29,7 @@ model Job {
     // New fields for comprehensive job posting
     employmentType     String   @db.VarChar(50) // Full-time, Part-time, Contract, Internship
     workplaceType      String   @db.VarChar(50) // Remote, Hybrid, On-site
-    location           String   @db.VarChar(255) // e.g., "Remote - Philippines" or "Remote - Global"
+    location           String?  @db.VarChar(255) // Required for Hybrid/On-site, optional for Remote
     benefits           String?  @db.Text // e.g., health insurance, flexible hours (Optional)
     
     // Salary fields - new structure
@@ -74,6 +74,10 @@ model Applicant {
     
     // Salary expectation (for jobs with salary range)
     expectedSalary     Decimal? @db.Decimal(15,2)
+    
+    // Relocation willingness (for Hybrid/On-site jobs when applicant is far away)
+    willingToRelocate  Boolean? @default(false)
+    applicantLocation  String?  @db.VarChar(255) // Optional: applicant's current location
     
     // AI Processing Status
     statusAI String @db.VarChar(50) @default("pending") // "pending", "parsing", "processing", "completed", "failed"

@@ -33,6 +33,8 @@ const formSchema = z.object({
     .email("Valid email is required")
     .max(255, "Email is too long"),
   expectedSalary: z.coerce.number().positive().optional(),
+  applicantLocation: z.string().max(255).optional(),
+  willingToRelocate: z.boolean().optional(),
   resumeFile: z
     .instanceof(File)
     .refine((file) => file.size > 0, "Please select a resume file")
@@ -59,6 +61,8 @@ interface ApplyFormProps {
   jobTitle: string;
   salaryType?: string | null;
   salaryCurrency?: string | null;
+  workplaceType?: string | null;
+  jobLocation?: string | null;
 }
 
 export function ApplyForm({
@@ -66,6 +70,8 @@ export function ApplyForm({
   jobTitle,
   salaryType,
   salaryCurrency,
+  workplaceType,
+  jobLocation,
 }: ApplyFormProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -76,6 +82,8 @@ export function ApplyForm({
       name: "",
       email: "",
       expectedSalary: undefined,
+      applicantLocation: "",
+      willingToRelocate: false,
     },
   });
 
@@ -130,6 +138,8 @@ export function ApplyForm({
         email: data.email,
         resumeFileName: fileName,
         expectedSalary: data.expectedSalary,
+        applicantLocation: data.applicantLocation,
+        willingToRelocate: data.willingToRelocate,
       });
     } catch (error) {
       const errorMessage =
@@ -253,6 +263,60 @@ export function ApplyForm({
                   </FormItem>
                 )}
               />
+            )}
+
+            {(workplaceType === "Hybrid" || workplaceType === "On-site") && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="applicantLocation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Your Current Location</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g., San Francisco, CA"
+                          {...field}
+                          disabled={applyMutation.isPending || isUploading}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Where are you currently located?
+                        {jobLocation && ` (Job location: ${jobLocation})`}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="willingToRelocate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4">
+                      <FormControl>
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={field.onChange}
+                          disabled={applyMutation.isPending || isUploading}
+                          className="text-primary focus:ring-primary h-4 w-4 rounded border-gray-300 focus:ring-2"
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          I am willing to relocate
+                          {jobLocation && ` to ${jobLocation}`}
+                        </FormLabel>
+                        <FormDescription>
+                          Check this if you&apos;re open to relocating for this
+                          position
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </>
             )}
 
             <FormField
