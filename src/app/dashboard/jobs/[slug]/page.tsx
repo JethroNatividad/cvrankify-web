@@ -305,14 +305,35 @@ const JobPage = async ({ params }: JobPageProps) => {
                   />
                 </div>
 
-                {/* Salary Range */}
-                {job.salaryRange && (
+                {/* Salary */}
+                {((job.salaryType === "FIXED" && job.fixedSalary) ??
+                  (job.salaryType === "RANGE" &&
+                    job.salaryRangeMin &&
+                    job.salaryRangeMax)) && (
                   <div>
                     <h4 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
                       <DollarSign className="mr-1 inline h-3.5 w-3.5 text-emerald-500" />
-                      Salary Range
+                      {job.salaryType === "FIXED"
+                        ? "Fixed Salary"
+                        : "Salary Range"}
                     </h4>
-                    <p className="text-sm font-medium">{job.salaryRange}</p>
+                    <p className="text-sm font-medium">
+                      {job.salaryType === "FIXED" && job.fixedSalary && (
+                        <span>
+                          {job.salaryCurrency ?? "USD"}{" "}
+                          {Number(job.fixedSalary).toLocaleString()}
+                        </span>
+                      )}
+                      {job.salaryType === "RANGE" &&
+                        job.salaryRangeMin &&
+                        job.salaryRangeMax && (
+                          <span>
+                            {job.salaryCurrency ?? "USD"}{" "}
+                            {Number(job.salaryRangeMin).toLocaleString()} -{" "}
+                            {Number(job.salaryRangeMax).toLocaleString()}
+                          </span>
+                        )}
+                    </p>
                   </div>
                 )}
 

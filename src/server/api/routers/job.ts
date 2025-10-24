@@ -9,33 +9,88 @@ import {
 export const jobRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
-      z.object({
-        title: z.string().min(1).max(255),
-        description: z.string().min(1),
-        skills: z.string().min(1),
-        yearsOfExperience: z.number().min(0).max(50),
-        educationDegree: z.string().min(1).max(100),
-        educationField: z.string().max(100).optional(),
-        timezone: z.string().min(1).max(100),
-        skillsWeight: z.number().min(0).max(1),
-        experienceWeight: z.number().min(0).max(1),
-        educationWeight: z.number().min(0).max(1),
-        timezoneWeight: z.number().min(0).max(1),
-        interviewsNeeded: z.number().min(1).max(10),
-        hiresNeeded: z.number().min(1).max(50),
-        // New required fields
-        employmentType: z.enum([
-          "Full-time",
-          "Part-time",
-          "Contract",
-          "Internship",
-        ]),
-        workplaceType: z.enum(["Remote", "Hybrid", "On-site"]),
-        location: z.string().min(1).max(255),
-        // New optional fields
-        benefits: z.string().optional(),
-        salaryRange: z.string().max(100).optional(),
-      }),
+      z
+        .object({
+          title: z.string().min(1).max(255),
+          description: z.string().min(1),
+          skills: z.string().min(1),
+          yearsOfExperience: z.number().min(0).max(50),
+          educationDegree: z.string().min(1).max(100),
+          educationField: z.string().max(100).optional(),
+          timezone: z.string().min(1).max(100),
+          skillsWeight: z.number().min(0).max(1),
+          experienceWeight: z.number().min(0).max(1),
+          educationWeight: z.number().min(0).max(1),
+          timezoneWeight: z.number().min(0).max(1),
+          interviewsNeeded: z.number().min(1).max(10),
+          hiresNeeded: z.number().min(1).max(50),
+          // New required fields
+          employmentType: z.enum([
+            "Full-time",
+            "Part-time",
+            "Contract",
+            "Internship",
+          ]),
+          workplaceType: z.enum(["Remote", "Hybrid", "On-site"]),
+          location: z.string().min(1).max(255),
+          // New optional fields
+          benefits: z.string().optional(),
+          // Salary fields
+          salaryType: z.enum(["FIXED", "RANGE"]).optional(),
+          fixedSalary: z.number().positive().optional(),
+          salaryRangeMin: z.number().positive().optional(),
+          salaryRangeMax: z.number().positive().optional(),
+          salaryCurrency: z.string().max(10).optional().default("USD"),
+        })
+        .refine(
+          (data) => {
+            // If salaryType is FIXED, fixedSalary must be provided
+            if (data.salaryType === "FIXED") {
+              return data.fixedSalary !== undefined && data.fixedSalary > 0;
+            }
+            return true;
+          },
+          {
+            message: "Fixed salary is required when salary type is FIXED",
+            path: ["fixedSalary"],
+          },
+        )
+        .refine(
+          (data) => {
+            // If salaryType is RANGE, both min and max must be provided
+            if (data.salaryType === "RANGE") {
+              return (
+                data.salaryRangeMin !== undefined &&
+                data.salaryRangeMax !== undefined &&
+                data.salaryRangeMin > 0 &&
+                data.salaryRangeMax > 0
+              );
+            }
+            return true;
+          },
+          {
+            message:
+              "Salary range minimum and maximum are required when salary type is RANGE",
+            path: ["salaryRangeMin"],
+          },
+        )
+        .refine(
+          (data) => {
+            // If salaryType is RANGE, max must be greater than min
+            if (
+              data.salaryType === "RANGE" &&
+              data.salaryRangeMin !== undefined &&
+              data.salaryRangeMax !== undefined
+            ) {
+              return data.salaryRangeMax > data.salaryRangeMin;
+            }
+            return true;
+          },
+          {
+            message: "Salary range maximum must be greater than minimum",
+            path: ["salaryRangeMax"],
+          },
+        ),
     )
     .mutation(async ({ ctx, input }) => {
       const job = await ctx.db.job.create({
@@ -57,7 +112,11 @@ export const jobRouter = createTRPCRouter({
           workplaceType: input.workplaceType,
           location: input.location,
           benefits: input.benefits,
-          salaryRange: input.salaryRange,
+          salaryType: input.salaryType,
+          fixedSalary: input.fixedSalary,
+          salaryRangeMin: input.salaryRangeMin,
+          salaryRangeMax: input.salaryRangeMax,
+          salaryCurrency: input.salaryCurrency,
           createdBy: { connect: { id: ctx.session.user.id } },
         },
       });
@@ -82,7 +141,18 @@ export const jobRouter = createTRPCRouter({
         },
       },
     });
-    return jobs;
+
+    // Convert Decimal fields to numbers for display
+    return jobs.map((job) => ({
+      ...job,
+      skillsWeight: Number(job.skillsWeight),
+      experienceWeight: Number(job.experienceWeight),
+      educationWeight: Number(job.educationWeight),
+      timezoneWeight: Number(job.timezoneWeight),
+      fixedSalary: job.fixedSalary ? Number(job.fixedSalary) : null,
+      salaryRangeMin: job.salaryRangeMin ? Number(job.salaryRangeMin) : null,
+      salaryRangeMax: job.salaryRangeMax ? Number(job.salaryRangeMax) : null,
+    }));
   }),
 
   getById: protectedProcedure
@@ -119,6 +189,9 @@ export const jobRouter = createTRPCRouter({
         timezoneWeight: job.timezoneWeight
           ? Number(job.timezoneWeight).toString()
           : "0",
+        fixedSalary: job.fixedSalary?.toString() ?? null,
+        salaryRangeMin: job.salaryRangeMin?.toString() ?? null,
+        salaryRangeMax: job.salaryRangeMax?.toString() ?? null,
         applicants: job.applicants.map((applicant) => ({
           ...applicant,
           skillsScoreAI: applicant.skillsScoreAI?.toString() ?? "0",
@@ -129,6 +202,7 @@ export const jobRouter = createTRPCRouter({
           parsedYearsOfExperience: applicant.parsedYearsOfExperience
             ? applicant.parsedYearsOfExperience.toString()
             : undefined,
+          expectedSalary: applicant.expectedSalary?.toString() ?? undefined,
           matchedSkills: applicant.matchedSkills.map((skill) => ({
             ...skill,
             score: skill.score?.toString() ?? "0",
@@ -141,35 +215,90 @@ export const jobRouter = createTRPCRouter({
 
   update: protectedProcedure
     .input(
-      z.object({
-        id: z.number(),
-        title: z.string().min(1).max(255),
-        description: z.string().min(1),
-        skills: z.string().min(1),
-        yearsOfExperience: z.number().min(0).max(50),
-        educationDegree: z.string().min(1).max(100),
-        educationField: z.string().max(100).optional(),
-        timezone: z.string().min(1).max(100),
-        skillsWeight: z.number().min(0).max(1),
-        experienceWeight: z.number().min(0).max(1),
-        educationWeight: z.number().min(0).max(1),
-        timezoneWeight: z.number().min(0).max(1),
-        interviewsNeeded: z.number().min(1).max(10),
-        hiresNeeded: z.number().min(1).max(50),
-        isOpen: z.boolean().optional(),
-        // New required fields
-        employmentType: z.enum([
-          "Full-time",
-          "Part-time",
-          "Contract",
-          "Internship",
-        ]),
-        workplaceType: z.enum(["Remote", "Hybrid", "On-site"]),
-        location: z.string().min(1).max(255),
-        // New optional fields
-        benefits: z.string().optional(),
-        salaryRange: z.string().max(100).optional(),
-      }),
+      z
+        .object({
+          id: z.number(),
+          title: z.string().min(1).max(255),
+          description: z.string().min(1),
+          skills: z.string().min(1),
+          yearsOfExperience: z.number().min(0).max(50),
+          educationDegree: z.string().min(1).max(100),
+          educationField: z.string().max(100).optional(),
+          timezone: z.string().min(1).max(100),
+          skillsWeight: z.number().min(0).max(1),
+          experienceWeight: z.number().min(0).max(1),
+          educationWeight: z.number().min(0).max(1),
+          timezoneWeight: z.number().min(0).max(1),
+          interviewsNeeded: z.number().min(1).max(10),
+          hiresNeeded: z.number().min(1).max(50),
+          isOpen: z.boolean().optional(),
+          // New required fields
+          employmentType: z.enum([
+            "Full-time",
+            "Part-time",
+            "Contract",
+            "Internship",
+          ]),
+          workplaceType: z.enum(["Remote", "Hybrid", "On-site"]),
+          location: z.string().min(1).max(255),
+          // New optional fields
+          benefits: z.string().optional(),
+          // Salary fields
+          salaryType: z.enum(["FIXED", "RANGE"]).optional(),
+          fixedSalary: z.number().positive().optional(),
+          salaryRangeMin: z.number().positive().optional(),
+          salaryRangeMax: z.number().positive().optional(),
+          salaryCurrency: z.string().max(10).optional().default("USD"),
+        })
+        .refine(
+          (data) => {
+            // If salaryType is FIXED, fixedSalary must be provided
+            if (data.salaryType === "FIXED") {
+              return data.fixedSalary !== undefined && data.fixedSalary > 0;
+            }
+            return true;
+          },
+          {
+            message: "Fixed salary is required when salary type is FIXED",
+            path: ["fixedSalary"],
+          },
+        )
+        .refine(
+          (data) => {
+            // If salaryType is RANGE, both min and max must be provided
+            if (data.salaryType === "RANGE") {
+              return (
+                data.salaryRangeMin !== undefined &&
+                data.salaryRangeMax !== undefined &&
+                data.salaryRangeMin > 0 &&
+                data.salaryRangeMax > 0
+              );
+            }
+            return true;
+          },
+          {
+            message:
+              "Salary range minimum and maximum are required when salary type is RANGE",
+            path: ["salaryRangeMin"],
+          },
+        )
+        .refine(
+          (data) => {
+            // If salaryType is RANGE, max must be greater than min
+            if (
+              data.salaryType === "RANGE" &&
+              data.salaryRangeMin !== undefined &&
+              data.salaryRangeMax !== undefined
+            ) {
+              return data.salaryRangeMax > data.salaryRangeMin;
+            }
+            return true;
+          },
+          {
+            message: "Salary range maximum must be greater than minimum",
+            path: ["salaryRangeMax"],
+          },
+        ),
     )
     .mutation(async ({ ctx, input }) => {
       const { id, ...updateData } = input;
@@ -210,7 +339,18 @@ export const jobRouter = createTRPCRouter({
         },
       },
     });
-    return jobs;
+
+    // Convert Decimal fields to numbers for display
+    return jobs.map((job) => ({
+      ...job,
+      skillsWeight: Number(job.skillsWeight),
+      experienceWeight: Number(job.experienceWeight),
+      educationWeight: Number(job.educationWeight),
+      timezoneWeight: Number(job.timezoneWeight),
+      fixedSalary: job.fixedSalary ? Number(job.fixedSalary) : null,
+      salaryRangeMin: job.salaryRangeMin ? Number(job.salaryRangeMin) : null,
+      salaryRangeMax: job.salaryRangeMax ? Number(job.salaryRangeMax) : null,
+    }));
   }),
 
   getByIdPublic: publicProcedure
@@ -243,6 +383,9 @@ export const jobRouter = createTRPCRouter({
         experienceWeight: Number(job.experienceWeight),
         educationWeight: Number(job.educationWeight),
         timezoneWeight: Number(job.timezoneWeight),
+        fixedSalary: job.fixedSalary ? Number(job.fixedSalary) : null,
+        salaryRangeMin: job.salaryRangeMin ? Number(job.salaryRangeMin) : null,
+        salaryRangeMax: job.salaryRangeMax ? Number(job.salaryRangeMax) : null,
       };
     }),
 });

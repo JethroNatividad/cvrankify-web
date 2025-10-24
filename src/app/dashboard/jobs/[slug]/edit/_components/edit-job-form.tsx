@@ -92,7 +92,12 @@ const formSchema = z
       .max(255, "Location is too long"),
     // New optional fields
     benefits: z.string().optional(),
-    salaryRange: z.string().max(100, "Salary range is too long").optional(),
+    // Salary fields
+    salaryType: z.enum(["FIXED", "RANGE"]).optional(),
+    fixedSalary: z.coerce.number().positive().optional(),
+    salaryRangeMin: z.coerce.number().positive().optional(),
+    salaryRangeMax: z.coerce.number().positive().optional(),
+    salaryCurrency: z.string().max(10).optional(),
   })
   .refine(
     (data) => {
@@ -106,6 +111,55 @@ const formSchema = z
     {
       message: "All weights must sum to 1.00",
       path: ["skillsWeight"],
+    },
+  )
+  .refine(
+    (data) => {
+      // If salaryType is FIXED, fixedSalary must be provided
+      if (data.salaryType === "FIXED") {
+        return data.fixedSalary !== undefined && data.fixedSalary > 0;
+      }
+      return true;
+    },
+    {
+      message: "Fixed salary is required when salary type is FIXED",
+      path: ["fixedSalary"],
+    },
+  )
+  .refine(
+    (data) => {
+      // If salaryType is RANGE, both min and max must be provided
+      if (data.salaryType === "RANGE") {
+        return (
+          data.salaryRangeMin !== undefined &&
+          data.salaryRangeMax !== undefined &&
+          data.salaryRangeMin > 0 &&
+          data.salaryRangeMax > 0
+        );
+      }
+      return true;
+    },
+    {
+      message:
+        "Salary range minimum and maximum are required when salary type is RANGE",
+      path: ["salaryRangeMin"],
+    },
+  )
+  .refine(
+    (data) => {
+      // If salaryType is RANGE, max must be greater than min
+      if (
+        data.salaryType === "RANGE" &&
+        data.salaryRangeMin !== undefined &&
+        data.salaryRangeMax !== undefined
+      ) {
+        return data.salaryRangeMax > data.salaryRangeMin;
+      }
+      return true;
+    },
+    {
+      message: "Salary range maximum must be greater than minimum",
+      path: ["salaryRangeMax"],
     },
   );
 
@@ -148,7 +202,16 @@ const EditJobForm = ({ job }: EditJobFormProps) => {
       workplaceType: job.workplaceType as "Remote" | "Hybrid" | "On-site",
       location: job.location,
       benefits: job.benefits ?? "",
-      salaryRange: job.salaryRange ?? "",
+      salaryType:
+        (job.salaryType as "FIXED" | "RANGE" | undefined) ?? undefined,
+      fixedSalary: job.fixedSalary ? Number(job.fixedSalary) : undefined,
+      salaryRangeMin: job.salaryRangeMin
+        ? Number(job.salaryRangeMin)
+        : undefined,
+      salaryRangeMax: job.salaryRangeMax
+        ? Number(job.salaryRangeMax)
+        : undefined,
+      salaryCurrency: job.salaryCurrency ?? "USD",
     },
   });
 
@@ -203,7 +266,16 @@ const EditJobForm = ({ job }: EditJobFormProps) => {
         workplaceType: job.workplaceType as "Remote" | "Hybrid" | "On-site",
         location: job.location,
         benefits: job.benefits ?? "",
-        salaryRange: job.salaryRange ?? "",
+        salaryType:
+          (job.salaryType as "FIXED" | "RANGE" | undefined) ?? undefined,
+        fixedSalary: job.fixedSalary ? Number(job.fixedSalary) : undefined,
+        salaryRangeMin: job.salaryRangeMin
+          ? Number(job.salaryRangeMin)
+          : undefined,
+        salaryRangeMax: job.salaryRangeMax
+          ? Number(job.salaryRangeMax)
+          : undefined,
+        salaryCurrency: job.salaryCurrency ?? "USD",
       });
     }
   }, [job, form]);
@@ -377,25 +449,181 @@ const EditJobForm = ({ job }: EditJobFormProps) => {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="salaryRange"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Salary Range (Optional)</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="e.g., $50,000 - $70,000 annually or Not disclosed"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Salary range or indicate if not disclosed
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
+          {/* Salary Section */}
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium">
+              Salary Information (Optional)
+            </h4>
+
+            <FormField
+              control={form.control}
+              name="salaryType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Salary Type</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value ?? ""}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select salary type (optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="FIXED">Fixed Salary</SelectItem>
+                        <SelectItem value="RANGE">Salary Range</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormDescription>
+                    Choose whether to offer a fixed salary or a salary range
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {form.watch("salaryType") === "FIXED" && (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="fixedSalary"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Fixed Salary</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="e.g., 75000"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          }
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter the fixed salary amount
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="salaryCurrency"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Currency</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value ?? "USD"}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select currency" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="USD">USD ($)</SelectItem>
+                            <SelectItem value="PHP">PHP (₱)</SelectItem>
+                            <SelectItem value="EUR">EUR (€)</SelectItem>
+                            <SelectItem value="GBP">GBP (£)</SelectItem>
+                            <SelectItem value="JPY">JPY (¥)</SelectItem>
+                            <SelectItem value="AUD">AUD (A$)</SelectItem>
+                            <SelectItem value="CAD">CAD (C$)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormDescription>Currency for the salary</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             )}
-          />
+
+            {form.watch("salaryType") === "RANGE" && (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <FormField
+                  control={form.control}
+                  name="salaryRangeMin"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Minimum Salary</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="e.g., 50000"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          }
+                        />
+                      </FormControl>
+                      <FormDescription>Minimum salary range</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="salaryRangeMax"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Maximum Salary</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="e.g., 70000"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          }
+                        />
+                      </FormControl>
+                      <FormDescription>Maximum salary range</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="salaryCurrency"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Currency</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value ?? "USD"}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select currency" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="USD">USD ($)</SelectItem>
+                            <SelectItem value="PHP">PHP (₱)</SelectItem>
+                            <SelectItem value="EUR">EUR (€)</SelectItem>
+                            <SelectItem value="GBP">GBP (£)</SelectItem>
+                            <SelectItem value="JPY">JPY (¥)</SelectItem>
+                            <SelectItem value="AUD">AUD (A$)</SelectItem>
+                            <SelectItem value="CAD">CAD (C$)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormDescription>Currency for the salary</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+          </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField

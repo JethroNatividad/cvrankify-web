@@ -54,7 +54,10 @@ We offer competitive compensation, flexible working arrangements, and opportunit
       location: "Remote - Global",
       benefits:
         "Competitive salary, health insurance, flexible working hours, remote work options, professional development budget, annual performance bonuses, unlimited PTO.",
-      salaryRange: "$100,000 - $150,000 annually",
+      salaryType: "RANGE",
+      salaryRangeMin: 100000,
+      salaryRangeMax: 150000,
+      salaryCurrency: "USD",
     },
     {
       title: "Product Manager - SaaS Platform",
@@ -90,7 +93,9 @@ This is an excellent opportunity to shape the future of our product and make a s
       location: "New York, NY",
       benefits:
         "Competitive salary and equity, comprehensive health benefits, 401(k) matching, flexible work arrangements, professional development opportunities, team events and offsites.",
-      salaryRange: "$120,000 - $160,000 annually",
+      salaryType: "FIXED",
+      fixedSalary: 140000,
+      salaryCurrency: "USD",
     },
     {
       title: "DevOps Engineer",
@@ -126,7 +131,10 @@ We offer opportunities to work with cutting-edge technologies and contribute to 
       location: "Remote - Europe",
       benefits:
         "Competitive compensation, remote work flexibility, health and dental insurance, learning and certification budget, home office stipend, annual company retreats.",
-      salaryRange: "$90,000 - $130,000 annually",
+      salaryType: "RANGE",
+      salaryRangeMin: 90000,
+      salaryRangeMax: 130000,
+      salaryCurrency: "USD",
     },
     {
       title: "Senior UX/UI Designer",
@@ -162,7 +170,10 @@ Join our team to create beautiful, functional designs that solve real user probl
       location: "San Francisco, CA",
       benefits:
         "Competitive salary, equity package, comprehensive health coverage, flexible PTO, gym membership, professional development budget, hybrid work model with flexible hours.",
-      salaryRange: "$95,000 - $135,000 annually",
+      salaryType: "RANGE",
+      salaryRangeMin: 95000,
+      salaryRangeMax: 135000,
+      salaryCurrency: "USD",
     },
     {
       title: "Data Scientist",
@@ -199,7 +210,10 @@ This is an excellent opportunity to work with cutting-edge data science technolo
       location: "Remote - Europe/Africa",
       benefits:
         "Competitive salary, remote work flexibility, health insurance, learning and conference budget, latest hardware and software, flexible working hours, annual team offsites.",
-      salaryRange: "$85,000 - $125,000 annually",
+      salaryType: "RANGE",
+      salaryRangeMin: 85000,
+      salaryRangeMax: 125000,
+      salaryCurrency: "USD",
     },
     {
       title: "Frontend Developer",
@@ -235,7 +249,10 @@ Join our team to work on innovative projects and contribute to products that are
       location: "Remote - Philippines",
       benefits:
         "Competitive salary, work-from-home setup, HMO coverage with dependents, paid time off, learning and development allowance, internet and electricity allowance, performance bonuses.",
-      salaryRange: "₱60,000 - ₱90,000 monthly",
+      salaryType: "RANGE",
+      salaryRangeMin: 60000,
+      salaryRangeMax: 90000,
+      salaryCurrency: "PHP",
     },
   ];
 

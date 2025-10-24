@@ -8,6 +8,7 @@ export type SerializedApplicant = Omit<
   | "timezoneScoreAI"
   | "overallScoreAI"
   | "parsedYearsOfExperience"
+  | "expectedSalary"
 > & {
   skillsScoreAI: string;
   experienceScoreAI: string;
@@ -15,6 +16,7 @@ export type SerializedApplicant = Omit<
   timezoneScoreAI: string;
   overallScoreAI: string;
   parsedYearsOfExperience?: string;
+  expectedSalary?: string;
 };
 
 export type ApplicantWithIncludes = Prisma.ApplicantGetPayload<{
@@ -40,6 +42,7 @@ export type SerializedApplicantWithIncludes = Omit<
   | "overallScoreAI"
   | "matchedSkills"
   | "parsedYearsOfExperience"
+  | "expectedSalary"
 > & {
   skillsScoreAI: string;
   experienceScoreAI: string;
@@ -47,6 +50,7 @@ export type SerializedApplicantWithIncludes = Omit<
   timezoneScoreAI: string;
   overallScoreAI: string;
   parsedYearsOfExperience?: string;
+  expectedSalary?: string;
   matchedSkills: SerializedMatchedSkill[];
 };
 
@@ -71,11 +75,17 @@ export type SerializedJob = Omit<
   | "experienceWeight"
   | "educationWeight"
   | "timezoneWeight"
+  | "fixedSalary"
+  | "salaryRangeMin"
+  | "salaryRangeMax"
   | "applicants"
 > & {
   skillsWeight: string;
   experienceWeight: string;
   educationWeight: string;
   timezoneWeight: string;
+  fixedSalary: string | null;
+  salaryRangeMin: string | null;
+  salaryRangeMax: string | null;
   applicants: SerializedApplicantWithIncludes[];
 };

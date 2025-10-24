@@ -32,6 +32,7 @@ const formSchema = z.object({
     .string()
     .email("Valid email is required")
     .max(255, "Email is too long"),
+  expectedSalary: z.coerce.number().positive().optional(),
   resumeFile: z
     .instanceof(File)
     .refine((file) => file.size > 0, "Please select a resume file")
@@ -56,9 +57,16 @@ type FormData = z.infer<typeof formSchema>;
 interface ApplyFormProps {
   jobId: number;
   jobTitle: string;
+  salaryType?: string | null;
+  salaryCurrency?: string | null;
 }
 
-export function ApplyForm({ jobId, jobTitle }: ApplyFormProps) {
+export function ApplyForm({
+  jobId,
+  jobTitle,
+  salaryType,
+  salaryCurrency,
+}: ApplyFormProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -67,6 +75,7 @@ export function ApplyForm({ jobId, jobTitle }: ApplyFormProps) {
     defaultValues: {
       name: "",
       email: "",
+      expectedSalary: undefined,
     },
   });
 
@@ -120,6 +129,7 @@ export function ApplyForm({ jobId, jobTitle }: ApplyFormProps) {
         name: data.name,
         email: data.email,
         resumeFileName: fileName,
+        expectedSalary: data.expectedSalary,
       });
     } catch (error) {
       const errorMessage =
@@ -213,6 +223,37 @@ export function ApplyForm({ jobId, jobTitle }: ApplyFormProps) {
                 </FormItem>
               )}
             />
+
+            {salaryType === "RANGE" && (
+              <FormField
+                control={form.control}
+                name="expectedSalary"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Expected Salary</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder={`Enter your expected salary ${salaryCurrency ? `(${salaryCurrency})` : ""}`}
+                        value={field.value ?? ""}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(
+                            value === "" ? undefined : e.target.valueAsNumber,
+                          );
+                        }}
+                        disabled={applyMutation.isPending || isUploading}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      What is your expected salary for this position?
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}

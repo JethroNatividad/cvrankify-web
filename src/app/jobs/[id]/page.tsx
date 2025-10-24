@@ -238,29 +238,53 @@ const PublicJobPage = async ({ params }: PublicJobPageProps) => {
           </Card>
 
           {/* Additional Job Info */}
-          {job.salaryRange && (
+          {(job.salaryType === "FIXED" && job.fixedSalary) ||
+          (job.salaryType === "RANGE" &&
+            job.salaryRangeMin &&
+            job.salaryRangeMax) ? (
             <Card>
               <CardHeader>
                 <h3 className="text-lg font-semibold">Job Details</h3>
               </CardHeader>
               <CardContent className="space-y-4">
-                {job.salaryRange && (
-                  <div className="flex items-start gap-3">
-                    <DollarSign className="mt-0.5 h-5 w-5 text-emerald-500" />
-                    <div>
-                      <div className="text-sm font-medium">Salary Range</div>
-                      <div className="text-muted-foreground text-sm font-medium">
-                        {job.salaryRange}
-                      </div>
+                <div className="flex items-start gap-3">
+                  <DollarSign className="mt-0.5 h-5 w-5 text-emerald-500" />
+                  <div>
+                    <div className="text-sm font-medium">
+                      {job.salaryType === "FIXED"
+                        ? "Fixed Salary"
+                        : "Salary Range"}
+                    </div>
+                    <div className="text-muted-foreground text-sm font-medium">
+                      {job.salaryType === "FIXED" && job.fixedSalary && (
+                        <span>
+                          {job.salaryCurrency ?? "USD"}{" "}
+                          {Number(job.fixedSalary).toLocaleString()}
+                        </span>
+                      )}
+                      {job.salaryType === "RANGE" &&
+                        job.salaryRangeMin &&
+                        job.salaryRangeMax && (
+                          <span>
+                            {job.salaryCurrency ?? "USD"}{" "}
+                            {Number(job.salaryRangeMin).toLocaleString()} -{" "}
+                            {Number(job.salaryRangeMax).toLocaleString()}
+                          </span>
+                        )}
                     </div>
                   </div>
-                )}
+                </div>
               </CardContent>
             </Card>
-          )}
+          ) : null}
 
           {/* Apply Section */}
-          <ApplyForm jobId={jobId} jobTitle={job.title} />
+          <ApplyForm
+            jobId={jobId}
+            jobTitle={job.title}
+            salaryType={job.salaryType}
+            salaryCurrency={job.salaryCurrency}
+          />
 
           {/* Company Info */}
           <Card>
