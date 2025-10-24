@@ -172,6 +172,7 @@ export function ApplicantsTable({ job }: ApplicantsTableProps) {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[60px]">Rank</TableHead>
                 <TableHead className="w-[200px]">Applicant</TableHead>
                 <TableHead className="w-[120px]">Overall Score</TableHead>
                 <TableHead className="w-[100px]">AI Status</TableHead>
@@ -181,7 +182,7 @@ export function ApplicantsTable({ job }: ApplicantsTableProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {applicants.map((applicant) => {
+              {applicants.map((applicant, index) => {
                 const overallScore = parseFloat(
                   applicant.overallScoreAI?.toString() || "0",
                 );
@@ -198,8 +199,16 @@ export function ApplicantsTable({ job }: ApplicantsTableProps) {
                   applicant.timezoneScoreAI?.toString() || "0",
                 );
 
+                const rank = index + 1;
+
                 return (
                   <TableRow key={applicant.id}>
+                    <TableCell>
+                      <div className="text-primary text-lg font-bold">
+                        #{rank}
+                      </div>
+                    </TableCell>
+
                     <TableCell>
                       <div className="space-y-1">
                         <div className="font-medium">{applicant.name}</div>
