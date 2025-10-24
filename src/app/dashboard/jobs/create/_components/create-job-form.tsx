@@ -37,7 +37,13 @@ const formSchema = z
       .number()
       .min(0, "Years of experience must be 0 or greater")
       .max(50, "Years of experience seems too high"),
-    educationDegree: z.enum(["None", "High School", "Bachelor", "Master", "PhD"]),
+    educationDegree: z.enum([
+      "None",
+      "High School",
+      "Bachelor",
+      "Master",
+      "PhD",
+    ]),
     educationField: z
       .string()
       .max(100, "Education field is too long")
@@ -71,14 +77,18 @@ const formSchema = z
       .min(1, "At least 1 hire is needed")
       .max(50, "Too many hires"),
     // New required fields
-    employmentType: z.enum(["Full-time", "Part-time", "Contract", "Internship"]),
+    employmentType: z.enum([
+      "Full-time",
+      "Part-time",
+      "Contract",
+      "Internship",
+    ]),
     workplaceType: z.enum(["Remote", "Hybrid", "On-site"]),
-    location: z.string().min(1, "Location is required").max(255, "Location is too long"),
-    qualifications: z.string().min(1, "Qualifications are required"),
+    location: z
+      .string()
+      .min(1, "Location is required")
+      .max(255, "Location is too long"),
     // New optional fields
-    preferredQualifications: z.string().optional(),
-    industry: z.string().max(100, "Industry is too long").optional(),
-    jobFunction: z.string().max(100, "Job function is too long").optional(),
     benefits: z.string().optional(),
     salaryRange: z.string().max(100, "Salary range is too long").optional(),
   })
@@ -119,10 +129,6 @@ const CreateJobForm = () => {
       employmentType: "Full-time",
       workplaceType: "Remote",
       location: "",
-      qualifications: "",
-      preferredQualifications: "",
-      industry: "",
-      jobFunction: "",
       benefits: "",
       salaryRange: "",
     },
@@ -285,86 +291,6 @@ const CreateJobForm = () => {
                     />
                   </FormControl>
                   <FormDescription>Job location or region</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="qualifications"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Qualifications / Requirements</FormLabel>
-                <FormControl>
-                  <textarea
-                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[120px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="List required qualifications, skills, tools, education requirements..."
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Required skills, tools, education, and other qualifications
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="preferredQualifications"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Preferred Qualifications (Optional)</FormLabel>
-                <FormControl>
-                  <textarea
-                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[100px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="List bonus skills, certifications, or nice-to-have qualifications..."
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Bonus skills and qualifications that would be advantageous
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="industry"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Industry (Optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g., Information Technology, Healthcare"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>Industry sector</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="jobFunction"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Job Function (Optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g., Engineering, Development, QA"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>Primary job function</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -596,21 +522,24 @@ const CreateJobForm = () => {
           </p>
           <div className="flex items-center gap-2 text-sm">
             <span className="font-medium">Current Sum:</span>
-            <span 
+            <span
               className={`font-mono ${
                 Math.abs(
-                  Number(form.watch('skillsWeight')) + 
-                  Number(form.watch('experienceWeight')) + 
-                  Number(form.watch('educationWeight')) + 
-                  Number(form.watch('timezoneWeight')) - 1
-                ) < 0.01 ? 'text-green-600' : 'text-red-600'
+                  Number(form.watch("skillsWeight")) +
+                    Number(form.watch("experienceWeight")) +
+                    Number(form.watch("educationWeight")) +
+                    Number(form.watch("timezoneWeight")) -
+                    1,
+                ) < 0.01
+                  ? "text-green-600"
+                  : "text-red-600"
               }`}
             >
               {(
-                Number(form.watch('skillsWeight')) + 
-                Number(form.watch('experienceWeight')) + 
-                Number(form.watch('educationWeight')) + 
-                Number(form.watch('timezoneWeight'))
+                Number(form.watch("skillsWeight")) +
+                Number(form.watch("experienceWeight")) +
+                Number(form.watch("educationWeight")) +
+                Number(form.watch("timezoneWeight"))
               ).toFixed(2)}
             </span>
             <span className="text-muted-foreground">/ 1.00</span>

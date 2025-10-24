@@ -30,10 +30,6 @@ model Job {
     employmentType     String   @db.VarChar(50) // Full-time, Part-time, Contract, Internship
     workplaceType      String   @db.VarChar(50) // Remote, Hybrid, On-site
     location           String   @db.VarChar(255) // e.g., "Remote - Philippines" or "Remote - Global"
-    qualifications     String   @db.Text // Skills, tools, education requirements
-    preferredQualifications String? @db.Text // Bonus skills, certifications (Optional)
-    industry           String?  @db.VarChar(100) // e.g., Information Technology, Software Development (Optional)
-    jobFunction        String?  @db.VarChar(100) // e.g., Engineering, Development, QA (Optional)
     benefits           String?  @db.Text // e.g., health insurance, flexible hours (Optional)
     salaryRange        String?  @db.VarChar(100) // Monthly or annual, or "Not disclosed" (Optional)
 

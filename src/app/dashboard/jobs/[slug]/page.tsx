@@ -17,8 +17,6 @@ import {
   Briefcase,
   Home,
   DollarSign,
-  Building2,
-  Target,
   Gift,
 } from "lucide-react";
 import Link from "next/link";
@@ -307,72 +305,16 @@ const JobPage = async ({ params }: JobPageProps) => {
                   />
                 </div>
 
-                {/* Qualifications */}
-                {job.qualifications && (
+                {/* Salary Range */}
+                {job.salaryRange && (
                   <div>
                     <h4 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
-                      Required Qualifications
+                      <DollarSign className="mr-1 inline h-3.5 w-3.5 text-emerald-500" />
+                      Salary Range
                     </h4>
-                    <ExpandableDescription
-                      description={job.qualifications}
-                      maxLength={200}
-                    />
+                    <p className="text-sm font-medium">{job.salaryRange}</p>
                   </div>
                 )}
-
-                {/* Preferred Qualifications */}
-                {job.preferredQualifications && (
-                  <div>
-                    <h4 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
-                      Preferred Qualifications
-                    </h4>
-                    <ExpandableDescription
-                      description={job.preferredQualifications}
-                      maxLength={200}
-                    />
-                  </div>
-                )}
-
-                {/* Additional Info Grid */}
-                <div className="grid grid-cols-2 gap-4 pt-2">
-                  {job.industry && (
-                    <div className="space-y-1">
-                      <h4 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                        Industry
-                      </h4>
-                      <div className="flex items-center gap-2">
-                        <Building2 className="h-3.5 w-3.5 text-indigo-500" />
-                        <span className="text-sm">{job.industry}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {job.jobFunction && (
-                    <div className="space-y-1">
-                      <h4 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                        Job Function
-                      </h4>
-                      <div className="flex items-center gap-2">
-                        <Target className="h-3.5 w-3.5 text-pink-500" />
-                        <span className="text-sm">{job.jobFunction}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {job.salaryRange && (
-                    <div className="space-y-1">
-                      <h4 className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                        Salary Range
-                      </h4>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-3.5 w-3.5 text-emerald-500" />
-                        <span className="text-sm font-medium">
-                          {job.salaryRange}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
 
                 {/* Benefits */}
                 {job.benefits && (

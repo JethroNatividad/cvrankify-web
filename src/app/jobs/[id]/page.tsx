@@ -14,8 +14,6 @@ import {
   Briefcase,
   Home,
   DollarSign,
-  Building2,
-  Target,
   Gift,
 } from "lucide-react";
 import Link from "next/link";
@@ -66,15 +64,15 @@ const PublicJobPage = async ({ params }: PublicJobPageProps) => {
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <Badge variant="secondary" className="text-sm">
                     <Briefcase className="mr-1 h-4 w-4" />
-                    {(job as any).employmentType}
+                    {job.employmentType}
                   </Badge>
                   <Badge variant="secondary" className="text-sm">
                     <Home className="mr-1 h-4 w-4" />
-                    {(job as any).workplaceType}
+                    {job.workplaceType}
                   </Badge>
                   <Badge variant="secondary" className="text-sm">
                     <MapPin className="mr-1 h-4 w-4" />
-                    {(job as any).location}
+                    {job.location}
                   </Badge>
                 </div>
                 <div className="text-muted-foreground mt-3 flex items-center gap-3">
@@ -188,40 +186,8 @@ const PublicJobPage = async ({ params }: PublicJobPageProps) => {
             </CardContent>
           </Card>
 
-          {/* Qualifications */}
-          {(job as any).qualifications && (
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-semibold">Qualifications</h2>
-              </CardHeader>
-              <CardContent>
-                <div className="prose prose-sm max-w-none">
-                  <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                    {(job as any).qualifications}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Preferred Qualifications */}
-          {(job as any).preferredQualifications && (
-            <Card>
-              <CardHeader>
-                <h2 className="text-xl font-semibold">Preferred Qualifications</h2>
-              </CardHeader>
-              <CardContent>
-                <div className="prose prose-sm max-w-none">
-                  <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                    {(job as any).preferredQualifications}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
           {/* Benefits */}
-          {(job as any).benefits && (
+          {job.benefits && (
             <Card>
               <CardHeader>
                 <h2 className="text-xl font-semibold">
@@ -232,7 +198,7 @@ const PublicJobPage = async ({ params }: PublicJobPageProps) => {
               <CardContent>
                 <div className="prose prose-sm max-w-none">
                   <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                    {(job as any).benefits}
+                    {job.benefits}
                   </p>
                 </div>
               </CardContent>
@@ -272,41 +238,19 @@ const PublicJobPage = async ({ params }: PublicJobPageProps) => {
           </Card>
 
           {/* Additional Job Info */}
-          {((job as any).industry || (job as any).jobFunction || (job as any).salaryRange) && (
+          {job.salaryRange && (
             <Card>
               <CardHeader>
                 <h3 className="text-lg font-semibold">Job Details</h3>
               </CardHeader>
               <CardContent className="space-y-4">
-                {(job as any).industry && (
-                  <div className="flex items-start gap-3">
-                    <Building2 className="mt-0.5 h-5 w-5 text-indigo-500" />
-                    <div>
-                      <div className="text-sm font-medium">Industry</div>
-                      <div className="text-muted-foreground text-sm">
-                        {(job as any).industry}
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {(job as any).jobFunction && (
-                  <div className="flex items-start gap-3">
-                    <Target className="mt-0.5 h-5 w-5 text-pink-500" />
-                    <div>
-                      <div className="text-sm font-medium">Job Function</div>
-                      <div className="text-muted-foreground text-sm">
-                        {(job as any).jobFunction}
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {(job as any).salaryRange && (
+                {job.salaryRange && (
                   <div className="flex items-start gap-3">
                     <DollarSign className="mt-0.5 h-5 w-5 text-emerald-500" />
                     <div>
                       <div className="text-sm font-medium">Salary Range</div>
                       <div className="text-muted-foreground text-sm font-medium">
-                        {(job as any).salaryRange}
+                        {job.salaryRange}
                       </div>
                     </div>
                   </div>
