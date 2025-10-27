@@ -1,7 +1,9 @@
 import { z } from "zod";
 import type { SerializedJob } from "~/lib/types";
+import { resumeQueue } from "~/lib/queue";
 import {
   createTRPCRouter,
+  externalAIProcedure,
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
@@ -32,7 +34,7 @@ export const jobRouter = createTRPCRouter({
             "Internship",
           ]),
           workplaceType: z.enum(["Remote", "Hybrid", "On-site"]),
-          location: z.string().min(1).max(255).optional(),
+          location: z.string().max(255).optional(),
           // New optional fields
           benefits: z.string().optional(),
           // Salary fields
@@ -420,6 +422,56 @@ export const jobRouter = createTRPCRouter({
         fixedSalary: job.fixedSalary ? Number(job.fixedSalary) : null,
         salaryRangeMin: job.salaryRangeMin ? Number(job.salaryRangeMin) : null,
         salaryRangeMax: job.salaryRangeMax ? Number(job.salaryRangeMax) : null,
+      };
+    }),
+
+  queueScoringAll: externalAIProcedure
+    .input(
+      z.object({
+        jobId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const job = await ctx.db.job.findUnique({
+        where: { id: input.jobId },
+        include: {
+          applicants: true,
+        },
+      });
+
+      if (!job) {
+        throw new Error("Job not found");
+      }
+
+      // Filter applicants that have resumes
+      const applicantsToProcess = job.applicants.filter(
+        (applicant) => applicant.resume,
+      );
+
+      if (applicantsToProcess.length === 0) {
+        throw new Error("No applicants with resumes to process");
+      }
+
+      // Queue all applicants for resume processing
+      const queuePromises = applicantsToProcess.map(async (applicant) => {
+        // Update statusAI to 'pending'
+        await ctx.db.applicant.update({
+          where: { id: applicant.id },
+          data: { statusAI: "pending" },
+        });
+
+        // Add to queue - we've already filtered for applicants with resumes
+        return resumeQueue.add("process-resume", {
+          applicantId: applicant.id,
+          resumePath: applicant.resume,
+        });
+      });
+
+      await Promise.all(queuePromises);
+
+      return {
+        success: true,
+        queued: applicantsToProcess.length,
       };
     }),
 });
