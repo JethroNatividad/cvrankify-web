@@ -38,7 +38,7 @@ interface JobCardProps {
     hiresNeeded: number;
     employmentType: string;
     workplaceType: string;
-    location: string;
+    location: string | null;
     _count: {
       applicants: number;
     };
