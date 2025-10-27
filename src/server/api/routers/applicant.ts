@@ -1,12 +1,39 @@
 import { z } from "zod";
 import { resumeQueue } from "~/lib/queue";
+import { getFileUrl } from "~/lib/minio";
 import {
   createTRPCRouter,
   publicProcedure,
+  protectedProcedure,
   externalAIProcedure,
 } from "~/server/api/trpc";
 
 export const applicantRouter = createTRPCRouter({
+  getResumeUrl: protectedProcedure
+    .input(
+      z.object({
+        applicantId: z.number(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const applicant = await ctx.db.applicant.findUnique({
+        where: { id: input.applicantId },
+      });
+
+      if (!applicant) {
+        throw new Error("Applicant not found");
+      }
+
+      if (!applicant.resume) {
+        throw new Error("No resume found for this applicant");
+      }
+
+      // Get presigned URL from MinIO
+      const url = await getFileUrl(applicant.resume);
+
+      return { url };
+    }),
+
   applyJob: publicProcedure
     .input(
       z.object({

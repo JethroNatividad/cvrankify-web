@@ -1,7 +1,9 @@
 "use client";
 
 import React from "react";
+import { FileText } from "lucide-react";
 import { Badge } from "~/app/_components/ui/badge";
+import { Button } from "~/app/_components/ui/button";
 import {
   Table,
   TableBody,
@@ -17,6 +19,8 @@ import {
   TooltipTrigger,
 } from "~/app/_components/ui/tooltip";
 import type { SerializedJob } from "~/lib/types";
+import { api } from "~/trpc/react";
+import { toast } from "sonner";
 import ApplicantEvaluationModal from "./applicant-evaluation-modal";
 
 interface ApplicantsTableProps {
@@ -83,6 +87,48 @@ const formatTimeAgo = (date: Date | string): string => {
     return "Unknown";
   }
 };
+
+function ViewResumeButton({ applicantId }: { applicantId: number }) {
+  const getResumeUrl = api.applicant.getResumeUrl.useQuery(
+    { applicantId },
+    {
+      enabled: false, // Don't fetch automatically
+    },
+  );
+
+  const handleViewResume = async () => {
+    try {
+      const result = await getResumeUrl.refetch();
+      if (result.data?.url) {
+        window.open(result.data.url, "_blank");
+      } else {
+        toast.error("Resume not available");
+      }
+    } catch (error) {
+      toast.error("Failed to load resume");
+      console.error("Error loading resume:", error);
+    }
+  };
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={handleViewResume}
+      disabled={getResumeUrl.isFetching}
+      className="w-full"
+    >
+      {getResumeUrl.isFetching ? (
+        "Loading..."
+      ) : (
+        <>
+          <FileText className="mr-2 h-4 w-4" />
+          View
+        </>
+      )}
+    </Button>
+  );
+}
 
 export function ApplicantsTable({ job }: ApplicantsTableProps) {
   // Sort applicants by overallScoreAI descending, if null or undefined, treat as 0
@@ -179,6 +225,7 @@ export function ApplicantsTable({ job }: ApplicantsTableProps) {
                 <TableHead className="w-[120px]">Interview Status</TableHead>
                 <TableHead className="w-[100px]">Applied</TableHead>
                 <TableHead className="w-[300px]">Assessment</TableHead>
+                <TableHead className="w-[100px]">Resume</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -309,6 +356,10 @@ export function ApplicantsTable({ job }: ApplicantsTableProps) {
                           Processing...
                         </div>
                       )}
+                    </TableCell>
+
+                    <TableCell>
+                      <ViewResumeButton applicantId={applicant.id} />
                     </TableCell>
                   </TableRow>
                 );
