@@ -154,7 +154,7 @@ const PublicJobPage = async ({ params }: PublicJobPageProps) => {
                   <div>
                     <div className="font-medium">Education</div>
                     <div className="text-muted-foreground text-sm">
-                      {job.educationDegree} degree
+                      {job.educationDegree} degree in {job.educationField}
                     </div>
                   </div>
                 </div>

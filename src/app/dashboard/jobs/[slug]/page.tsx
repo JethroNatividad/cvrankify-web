@@ -189,7 +189,7 @@ const JobPage = async ({ params }: JobPageProps) => {
                       <div className="flex items-center gap-2">
                         <GraduationCap className="h-3.5 w-3.5 text-green-500" />
                         <span className="text-sm">
-                          {job.educationDegree} degree
+                          {job.educationDegree} degree in {job.educationField}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
