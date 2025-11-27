@@ -131,15 +131,28 @@ function ViewResumeButton({ applicantId }: { applicantId: number }) {
 }
 
 export function ApplicantsTable({ job }: ApplicantsTableProps) {
-  // Sort applicants by overallScoreAI descending, if null or undefined, treat as 0
+  // Separate completed and non-completed applicants
   let { applicants } = job;
-  applicants = applicants
-    ?.slice()
-    .sort(
-      (a, b) =>
-        (parseFloat(b.overallScoreAI?.toString() || "0") || 0) -
-        (parseFloat(a.overallScoreAI?.toString() || "0") || 0),
-    );
+
+  const completedApplicants =
+    applicants
+      ?.filter((applicant) => applicant.statusAI === "completed")
+      ?.sort(
+        (a, b) =>
+          (parseFloat(b.overallScoreAI?.toString() || "0") || 0) -
+          (parseFloat(a.overallScoreAI?.toString() || "0") || 0),
+      ) || [];
+
+  const nonCompletedApplicants =
+    applicants
+      ?.filter((applicant) => applicant.statusAI !== "completed")
+      ?.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      ) || [];
+
+  // Combine arrays with completed first, then non-completed
+  applicants = [...completedApplicants, ...nonCompletedApplicants];
 
   if (!applicants?.length) {
     return (
@@ -229,7 +242,7 @@ export function ApplicantsTable({ job }: ApplicantsTableProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {applicants.map((applicant, index) => {
+              {applicants.map((applicant) => {
                 const overallScore = parseFloat(
                   applicant.overallScoreAI?.toString() || "0",
                 );
@@ -246,14 +259,23 @@ export function ApplicantsTable({ job }: ApplicantsTableProps) {
                   applicant.timezoneScoreAI?.toString() || "0",
                 );
 
-                const rank = index + 1;
+                // Only show rank for completed applicants
+                const isCompleted = applicant.statusAI === "completed";
+                const completedIndex = completedApplicants.findIndex(
+                  (ca) => ca.id === applicant.id,
+                );
+                const rank = isCompleted ? completedIndex + 1 : null;
 
                 return (
                   <TableRow key={applicant.id}>
                     <TableCell>
-                      <div className="text-primary text-lg font-bold">
-                        #{rank}
-                      </div>
+                      {rank ? (
+                        <div className="text-primary text-lg font-bold">
+                          #{rank}
+                        </div>
+                      ) : (
+                        <div className="text-muted-foreground text-sm">-</div>
+                      )}
                     </TableCell>
 
                     <TableCell>
