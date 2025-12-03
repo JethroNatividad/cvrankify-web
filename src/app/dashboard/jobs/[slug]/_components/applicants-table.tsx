@@ -1,7 +1,13 @@
 "use client";
 
 import React from "react";
-import { FileText } from "lucide-react";
+import {
+  FileText,
+  UserCheck,
+  UserX,
+  Calendar,
+  MoreHorizontal,
+} from "lucide-react";
 import { Badge } from "~/app/_components/ui/badge";
 import { Button } from "~/app/_components/ui/button";
 import {
@@ -18,8 +24,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/app/_components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/app/_components/ui/dropdown-menu";
 import type { SerializedJob } from "~/lib/types";
 import ApplicantEvaluationModal from "./applicant-evaluation-modal";
+import { api } from "~/trpc/react";
+import { useRouter } from "next/navigation";
 
 interface ApplicantsTableProps {
   job: SerializedJob;
@@ -102,6 +117,122 @@ function ViewResumeButton({ applicantId }: { applicantId: number }) {
       <FileText className="mr-2 h-4 w-4" />
       View
     </Button>
+  );
+}
+
+interface InterviewStatusActionsProps {
+  applicantId: number;
+  currentStage: number;
+  interviewStatus: string;
+  statusAI: string;
+  interviewsNeeded: number;
+}
+
+function InterviewStatusActions({
+  applicantId,
+  currentStage,
+  interviewStatus,
+  statusAI,
+  interviewsNeeded,
+}: InterviewStatusActionsProps) {
+  const router = useRouter();
+  const utils = api.useUtils();
+
+  const proceedToInterview = api.applicant.proceedToInterview.useMutation({
+    onSuccess: () => {
+      void utils.job.getById.invalidate();
+      router.refresh();
+    },
+  });
+
+  const updateInterviewStatus = api.applicant.updateInterviewStatus.useMutation(
+    {
+      onSuccess: () => {
+        void utils.job.getById.invalidate();
+        router.refresh();
+      },
+    },
+  );
+
+  // Don't show actions if AI processing is not complete
+  if (statusAI !== "completed") {
+    return <span className="text-muted-foreground text-xs">—</span>;
+  }
+
+  // If hired or rejected, show final state
+  if (interviewStatus === "hired" || interviewStatus === "rejected") {
+    return null;
+  }
+
+  const handleProceedToInterview = () => {
+    proceedToInterview.mutate({ applicantId });
+  };
+
+  const handleHire = () => {
+    updateInterviewStatus.mutate({
+      applicantId,
+      interviewStatus: "hired",
+      currentStage,
+    });
+  };
+
+  const handleReject = () => {
+    updateInterviewStatus.mutate({
+      applicantId,
+      interviewStatus: "rejected",
+      currentStage,
+    });
+  };
+
+  const isLoading =
+    proceedToInterview.isPending || updateInterviewStatus.isPending;
+
+  const getInterviewLabel = () => {
+    if (interviewsNeeded > 1) {
+      return currentStage === 0
+        ? "Proceed to Interview 1"
+        : `Proceed to Interview ${currentStage + 1}`;
+    }
+    return "Proceed to Interview";
+  };
+
+  const isInInterview = currentStage > 0;
+  const isLastInterview = currentStage >= interviewsNeeded;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={isLoading}
+          className="h-8 w-8 p-0"
+        >
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {/* Show proceed to interview if not at last stage */}
+        {!isLastInterview && (
+          <DropdownMenuItem onClick={handleProceedToInterview}>
+            <Calendar className="mr-2 h-4 w-4 text-blue-600" />
+            {getInterviewLabel()}
+          </DropdownMenuItem>
+        )}
+        {/* Show hire option if in interview process */}
+        {isInInterview && (
+          <DropdownMenuItem onClick={handleHire}>
+            <UserCheck className="mr-2 h-4 w-4 text-green-600" />
+            Hire
+          </DropdownMenuItem>
+        )}
+        {(isInInterview || !isLastInterview) && <DropdownMenuSeparator />}
+        <DropdownMenuItem onClick={handleReject} className="text-red-600">
+          <UserX className="mr-2 h-4 w-4" />
+          Reject
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -214,6 +345,7 @@ export function ApplicantsTable({ job }: ApplicantsTableProps) {
                 <TableHead className="w-[100px]">Applied</TableHead>
                 <TableHead className="w-[300px]">Assessment</TableHead>
                 <TableHead className="w-[100px]">Resume</TableHead>
+                <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -301,12 +433,21 @@ export function ApplicantsTable({ job }: ApplicantsTableProps) {
                     </TableCell>
 
                     <TableCell>
-                      <Badge
-                        variant={getStatusColor(applicant.interviewStatus)}
-                        className="text-xs"
-                      >
-                        {applicant.interviewStatus}
-                      </Badge>
+                      <div className="flex flex-col gap-1">
+                        <Badge
+                          variant={getStatusColor(applicant.interviewStatus)}
+                          className="text-xs"
+                        >
+                          {applicant.interviewStatus}
+                        </Badge>
+                        {applicant.currentStage > 0 && (
+                          <span className="text-muted-foreground text-xs">
+                            {job.interviewsNeeded > 1
+                              ? `Interview ${applicant.currentStage}`
+                              : "Interview"}
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
 
                     <TableCell>
@@ -357,6 +498,16 @@ export function ApplicantsTable({ job }: ApplicantsTableProps) {
 
                     <TableCell>
                       <ViewResumeButton applicantId={applicant.id} />
+                    </TableCell>
+
+                    <TableCell>
+                      <InterviewStatusActions
+                        applicantId={applicant.id}
+                        currentStage={applicant.currentStage}
+                        interviewStatus={applicant.interviewStatus}
+                        statusAI={applicant.statusAI}
+                        interviewsNeeded={job.interviewsNeeded}
+                      />
                     </TableCell>
                   </TableRow>
                 );

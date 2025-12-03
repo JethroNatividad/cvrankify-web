@@ -388,4 +388,114 @@ export const applicantRouter = createTRPCRouter({
 
       return { success: true };
     }),
+
+  updateInterviewStatus: protectedProcedure
+    .input(
+      z.object({
+        applicantId: z.number(),
+        interviewStatus: z.enum([
+          "pending",
+          "scheduled",
+          "passed",
+          "failed",
+          "hired",
+          "rejected",
+        ]),
+        currentStage: z.number().min(0).optional(),
+        interviewNotes: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Verify the applicant exists and belongs to a job owned by the user
+      const applicant = await ctx.db.applicant.findUnique({
+        where: { id: input.applicantId },
+        include: { job: true },
+      });
+
+      if (!applicant) {
+        throw new Error("Applicant not found");
+      }
+
+      if (applicant.job.createdById !== ctx.session.user.id) {
+        throw new Error("You do not have permission to update this applicant");
+      }
+
+      // Use a transaction to update applicant and job atomically
+      const result = await ctx.db.$transaction(async (tx) => {
+        // Update the applicant's interview status
+        const updatedApplicant = await tx.applicant.update({
+          where: { id: input.applicantId },
+          data: {
+            interviewStatus: input.interviewStatus,
+            currentStage: input.currentStage,
+            interviewNotes: input.interviewNotes,
+          },
+        });
+
+        // If the applicant is being hired, increment the job's hires counter
+        if (
+          input.interviewStatus === "hired" &&
+          applicant.interviewStatus !== "hired"
+        ) {
+          await tx.job.update({
+            where: { id: applicant.jobId },
+            data: {
+              hires: { increment: 1 },
+            },
+          });
+        }
+
+        // If the applicant was previously hired but is now being set to another status, decrement hires
+        if (
+          applicant.interviewStatus === "hired" &&
+          input.interviewStatus !== "hired"
+        ) {
+          await tx.job.update({
+            where: { id: applicant.jobId },
+            data: {
+              hires: { decrement: 1 },
+            },
+          });
+        }
+
+        return updatedApplicant;
+      });
+
+      return { success: true, applicant: result };
+    }),
+
+  proceedToInterview: protectedProcedure
+    .input(
+      z.object({
+        applicantId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Verify the applicant exists and belongs to a job owned by the user
+      const applicant = await ctx.db.applicant.findUnique({
+        where: { id: input.applicantId },
+        include: { job: true },
+      });
+
+      if (!applicant) {
+        throw new Error("Applicant not found");
+      }
+
+      if (applicant.job.createdById !== ctx.session.user.id) {
+        throw new Error("You do not have permission to update this applicant");
+      }
+
+      // Increment the current stage and set status to scheduled
+      const newStage = applicant.currentStage + 1;
+
+      const updatedApplicant = await ctx.db.applicant.update({
+        where: { id: input.applicantId },
+        data: {
+          currentStage: newStage,
+          interviewStatus: "scheduled",
+        },
+      });
+
+      return { success: true, applicant: updatedApplicant };
+    }),
 });
