@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +8,8 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "~/app/_components/ui/dialog";
+import { Button } from "~/app/_components/ui/button";
+import { Printer } from "lucide-react";
 import { cn } from "~/lib/utils";
 import type {
   SerializedApplicantWithIncludes,
@@ -107,6 +109,335 @@ export default function ApplicantEvaluationModal({
   children,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = () => {
+    const printContent = printRef.current;
+    if (!printContent) return;
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Applicant Evaluation - ${applicant.email}</title>
+          <style>
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+              line-height: 1.3;
+              color: #1a1a1a;
+              padding: 12px;
+              max-width: 800px;
+              margin: 0 auto;
+              font-size: 11px;
+            }
+            h1 {
+              font-size: 16px;
+              margin-bottom: 2px;
+            }
+            .description {
+              color: #666;
+              font-size: 10px;
+              margin-bottom: 10px;
+            }
+            section {
+              margin-bottom: 10px;
+            }
+            h3 {
+              font-size: 9px;
+              text-transform: uppercase;
+              color: #666;
+              font-weight: 600;
+              margin-bottom: 4px;
+            }
+            .section-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 4px;
+            }
+            .points {
+              font-size: 10px;
+              font-weight: 600;
+              color: #2563eb;
+            }
+            .table {
+              width: 100%;
+              border-collapse: collapse;
+              border: 1px solid #e5e5e5;
+              font-size: 10px;
+            }
+            .table th, .table td {
+              padding: 4px 6px;
+              text-align: left;
+              border: 1px solid #e5e5e5;
+            }
+            .table th {
+              background: #f5f5f5;
+              font-size: 9px;
+              color: #666;
+            }
+            .card {
+              border: 1px solid #e5e5e5;
+              border-radius: 4px;
+              padding: 6px 8px;
+              font-size: 10px;
+            }
+            .card-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .skill-item {
+              padding: 3px 0;
+              border-bottom: 1px solid #eee;
+            }
+            .skill-item:last-child {
+              border-bottom: none;
+            }
+            .skill-name {
+              font-weight: 500;
+              font-size: 10px;
+            }
+            .skill-reason {
+              font-size: 9px;
+              color: #666;
+            }
+            .badge {
+              display: inline-block;
+              padding: 1px 5px;
+              border-radius: 3px;
+              font-size: 9px;
+              font-weight: 500;
+            }
+            .badge-green {
+              background: #dcfce7;
+              color: #166534;
+            }
+            .badge-blue {
+              background: #dbeafe;
+              color: #1d4ed8;
+            }
+            .badge-red {
+              background: #fee2e2;
+              color: #b91c1c;
+            }
+            .badge-gray {
+              background: #f3f4f6;
+              color: #4b5563;
+            }
+            .experience-item {
+              padding: 6px 8px;
+              border: 1px solid #e5e5e5;
+              border-radius: 4px;
+              margin-bottom: 4px;
+            }
+            .experience-item.relevant {
+              border-left: 3px solid #22c55e;
+            }
+            .job-title {
+              font-weight: 500;
+              font-size: 10px;
+            }
+            .date-range {
+              font-size: 9px;
+              color: #666;
+            }
+            .overall-score {
+              border: 1px solid #dbeafe;
+              background: #eff6ff;
+              border-radius: 4px;
+              padding: 8px 10px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-top: 8px;
+            }
+            .overall-score h3 {
+              font-size: 12px;
+              color: #1a1a1a;
+              text-transform: none;
+              margin: 0;
+            }
+            .overall-score .score {
+              font-size: 18px;
+              font-weight: 700;
+              color: #2563eb;
+            }
+            .score-breakdown {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 3px 12px;
+              margin-top: 6px;
+              font-size: 9px;
+              color: #666;
+            }
+            .score-item {
+              display: flex;
+              justify-content: space-between;
+            }
+            .text-green {
+              color: #16a34a;
+              font-weight: 500;
+            }
+            .text-red {
+              color: #dc2626;
+            }
+            .two-col {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 10px;
+            }
+            @media print {
+              body {
+                padding: 8px;
+              }
+              section {
+                page-break-inside: avoid;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>${applicant.email}</h1>
+          <p class="description">Evaluation against job requirements</p>
+          
+          <section>
+            <h3>Job Requirements vs Applicant</h3>
+            <table class="table">
+              <tr>
+                <th>Criteria</th>
+                <th>Job Requirement</th>
+                <th>Applicant</th>
+              </tr>
+              <tr>
+                <td><strong>Education</strong></td>
+                <td>${job.educationDegree}${job.educationField ? ` in ${job.educationField}` : ""}</td>
+                <td>${applicant.parsedHighestEducationDegree} in ${applicant.parsedEducationField}</td>
+              </tr>
+              <tr>
+                <td><strong>Experience</strong></td>
+                <td>${job.yearsOfExperience} years</td>
+                <td class="${applicant.parsedYearsOfExperience !== null && Number(applicant.parsedYearsOfExperience) >= job.yearsOfExperience ? "text-green" : "text-red"}">${Number(applicant.parsedYearsOfExperience ?? 0)} years</td>
+              </tr>
+              <tr>
+                <td><strong>Skills</strong></td>
+                <td>${job.skills}</td>
+                <td>${applicant.parsedSkills}</td>
+              </tr>
+              <tr>
+                <td><strong>Timezone</strong></td>
+                <td>${job.timezone}</td>
+                <td>${applicant.parsedTimezone}</td>
+              </tr>
+            </table>
+          </section>
+
+          <section>
+            <div class="section-header">
+              <h3>Skills Match</h3>
+              <span class="points">${applicant.skillsScoreAI.toString()} pts</span>
+            </div>
+            <div class="card">
+              ${applicant.matchedSkills
+                .map(
+                  (s) => `
+                <div class="skill-item">
+                  <div class="card-header">
+                    <div>
+                      <span class="skill-name">${s.jobSkill}</span>
+                      <span class="skill-reason"> - ${s.reason}${s.matchType === "implied" && s.applicantSkill ? ` <span style="color: #2563eb">(from ${s.applicantSkill})</span>` : ""}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <span style="font-size: 9px; color: #666;">${(Number(s.score) * 100).toFixed(0)}%</span>
+                      <span class="badge ${s.matchType === "explicit" ? "badge-green" : s.matchType === "implied" ? "badge-blue" : "badge-red"}">${s.matchType.charAt(0).toUpperCase() + s.matchType.slice(1)}</span>
+                    </div>
+                  </div>
+                </div>
+              `,
+                )
+                .join("")}
+            </div>
+          </section>
+
+          <section>
+            <div class="section-header">
+              <h3>Experiences <span style="font-weight: normal; text-transform: none;">(Total: ${Number(applicant.parsedYearsOfExperience ?? 0)} yrs)</span></h3>
+              <span class="points">${applicant.experienceScoreAI.toString()} pts</span>
+            </div>
+            ${
+              applicant.experiences.length > 0
+                ? applicant.experiences
+                    .map(
+                      (exp) => `
+                <div class="experience-item ${exp.relevant ? "relevant" : ""}">
+                  <div class="card-header">
+                    <div>
+                      <span class="job-title">${exp.jobTitle}</span>
+                      <span class="date-range"> · ${exp.startMonth} ${exp.startYear} – ${exp.endMonth !== "None" ? exp.endMonth : "Present"} ${exp.endYear !== "Present" ? exp.endYear : ""}</span>
+                    </div>
+                    <span class="badge ${exp.relevant ? "badge-green" : "badge-gray"}">${exp.relevant ? "Relevant" : "Not Relevant"}</span>
+                  </div>
+                </div>
+              `,
+                    )
+                    .join("")
+                : '<p style="color: #666; font-size: 10px;">No experiences found.</p>'
+            }
+          </section>
+
+          <div class="two-col">
+            <section>
+              <div class="section-header">
+                <h3>Education Match</h3>
+                <span class="points">${applicant.educationScoreAI.toString()} pts</span>
+              </div>
+              <div class="card">
+                ${applicant.parsedHighestEducationDegree} in ${applicant.parsedEducationField}
+              </div>
+            </section>
+
+            <section>
+              <div class="section-header">
+                <h3>Timezone</h3>
+                <span class="points">${applicant.timezoneScoreAI.toString()} pts</span>
+              </div>
+              <div class="card">
+                ${applicant.parsedTimezone}
+              </div>
+            </section>
+          </div>
+
+          <section>
+            <div class="overall-score">
+              <h3>Overall AI Score</h3>
+              <span class="score">${applicant.overallScoreAI.toString()}</span>
+            </div>
+            <div class="score-breakdown">
+              <div class="score-item"><span>Skills:</span><span>${applicant.skillsScoreAI.toString()}</span></div>
+              <div class="score-item"><span>Experience:</span><span>${applicant.experienceScoreAI.toString()}</span></div>
+              <div class="score-item"><span>Education:</span><span>${applicant.educationScoreAI.toString()}</span></div>
+              <div class="score-item"><span>Timezone:</span><span>${applicant.timezoneScoreAI.toString()}</span></div>
+            </div>
+          </section>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -114,14 +445,27 @@ export default function ApplicantEvaluationModal({
 
       <DialogContent className="max-h-[85vh] max-w-4xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{applicant.email}</DialogTitle>
-          <DialogDescription>
-            Detailed evaluation and scoring of applicant against job
-            requirements
-          </DialogDescription>
+          <div className="flex items-start justify-between">
+            <div>
+              <DialogTitle>{applicant.email}</DialogTitle>
+              <DialogDescription>
+                Detailed evaluation and scoring of applicant against job
+                requirements
+              </DialogDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePrint}
+              className="mr-6 flex items-center gap-2"
+            >
+              <Printer className="h-4 w-4" />
+              Print
+            </Button>
+          </div>
         </DialogHeader>
 
-        <div className="mt-4 space-y-6">
+        <div ref={printRef} className="mt-4 space-y-6">
           {/* 📊 Job vs Applicant Comparison */}
           <section>
             <h3 className="text-muted-foreground mb-2 text-sm font-semibold uppercase">
