@@ -19,8 +19,6 @@ import {
   TooltipTrigger,
 } from "~/app/_components/ui/tooltip";
 import type { SerializedJob } from "~/lib/types";
-import { api } from "~/trpc/react";
-import { toast } from "sonner";
 import ApplicantEvaluationModal from "./applicant-evaluation-modal";
 
 interface ApplicantsTableProps {
@@ -89,25 +87,9 @@ const formatTimeAgo = (date: Date | string): string => {
 };
 
 function ViewResumeButton({ applicantId }: { applicantId: number }) {
-  const getResumeUrl = api.applicant.getResumeUrl.useQuery(
-    { applicantId },
-    {
-      enabled: false, // Don't fetch automatically
-    },
-  );
-
-  const handleViewResume = async () => {
-    try {
-      const result = await getResumeUrl.refetch();
-      if (result.data?.url) {
-        window.open(result.data.url, "_blank");
-      } else {
-        toast.error("Resume not available");
-      }
-    } catch (error) {
-      toast.error("Failed to load resume");
-      console.error("Error loading resume:", error);
-    }
+  const handleViewResume = () => {
+    // Open the resume via the API proxy route
+    window.open(`/api/resume/${applicantId}`, "_blank");
   };
 
   return (
@@ -115,17 +97,10 @@ function ViewResumeButton({ applicantId }: { applicantId: number }) {
       variant="outline"
       size="sm"
       onClick={handleViewResume}
-      disabled={getResumeUrl.isFetching}
       className="w-full"
     >
-      {getResumeUrl.isFetching ? (
-        "Loading..."
-      ) : (
-        <>
-          <FileText className="mr-2 h-4 w-4" />
-          View
-        </>
-      )}
+      <FileText className="mr-2 h-4 w-4" />
+      View
     </Button>
   );
 }
