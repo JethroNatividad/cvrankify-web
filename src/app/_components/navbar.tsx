@@ -31,6 +31,12 @@ const Navbar = ({ user, companyName }: Props) => {
         <h1 className="text-2xl font-bold">{companyName ?? "CVRankify"}</h1>
       </Link>
 
+      {!user && (
+        <Link href="/dashboard">
+          <Button variant="outline">admin</Button>
+        </Link>
+      )}
+
       {user && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

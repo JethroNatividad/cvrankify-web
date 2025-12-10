@@ -150,7 +150,7 @@ function EmptyJobsState() {
       </div>
       <h3 className="mb-2 text-xl font-semibold">No jobs available</h3>
       <p className="text-muted-foreground mx-auto mb-6 max-w-md">
-        There are no open job positions at the moment. Check back later for new
+        There are no open job position/s at the moment. Check back later for new
         opportunities.
       </p>
     </div>

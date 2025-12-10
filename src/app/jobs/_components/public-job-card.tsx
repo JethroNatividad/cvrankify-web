@@ -103,7 +103,7 @@ const PublicJobCard = ({ job }: PublicJobCardProps) => {
             </div>
             <div className="flex items-center gap-1.5">
               <Users className="h-3 w-3 text-orange-500" />
-              <span>{positionsRemaining} positions</span>
+              <span>{positionsRemaining} position/s</span>
             </div>
           </div>
         </div>

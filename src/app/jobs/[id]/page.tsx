@@ -178,7 +178,7 @@ const PublicJobPage = async ({ params }: PublicJobPageProps) => {
                   <div>
                     <div className="font-medium">Positions</div>
                     <div className="text-muted-foreground text-sm">
-                      {positionsRemaining} positions available
+                      {positionsRemaining} position/s available
                     </div>
                   </div>
                 </div>

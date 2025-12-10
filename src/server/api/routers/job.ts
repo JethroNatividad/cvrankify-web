@@ -158,6 +158,14 @@ export const jobRouter = createTRPCRouter({
             applicants: true,
           },
         },
+        applicants: {
+          where: {
+            interviewStatus: "scheduled",
+          },
+          select: {
+            id: true,
+          },
+        },
       },
     });
 
@@ -171,6 +179,7 @@ export const jobRouter = createTRPCRouter({
       fixedSalary: job.fixedSalary ? Number(job.fixedSalary) : null,
       salaryRangeMin: job.salaryRangeMin ? Number(job.salaryRangeMin) : null,
       salaryRangeMax: job.salaryRangeMax ? Number(job.salaryRangeMax) : null,
+      interviewing: job.applicants.length,
     }));
   }),
 
