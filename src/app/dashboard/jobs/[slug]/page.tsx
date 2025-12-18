@@ -22,6 +22,7 @@ import {
 import Link from "next/link";
 import { ExpandableDescription } from "./_components/expandable-description";
 import { ApplicantsTable } from "./_components/applicants-table";
+import { ReScoreButton } from "./_components/rescore-button";
 
 interface JobPageProps {
   params: Promise<{ slug: string }>;
@@ -151,12 +152,15 @@ const JobPage = async ({ params }: JobPageProps) => {
               {new Date(job.updatedAt).toLocaleDateString()}
             </p>
           </div>
-          <Button asChild>
-            <Link href={`/dashboard/jobs/${jobId}/edit`}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </Link>
-          </Button>
+          <div className="space-x-2">
+            <ReScoreButton jobId={jobId} />
+            <Button asChild>
+              <Link href={`/dashboard/jobs/${jobId}/edit`}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <Collapsible defaultOpen>

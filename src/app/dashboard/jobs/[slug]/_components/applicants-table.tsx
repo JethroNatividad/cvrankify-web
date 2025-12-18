@@ -154,6 +154,15 @@ function InterviewStatusActions({
     },
   );
 
+  const reProcess = api.applicant.reProcessApplicant.useMutation({
+    onSuccess: () => {
+      void utils.job.getById.invalidate();
+      router.refresh();
+    },
+  });
+
+  // reProcessApplicant: protectedProcedure
+
   // Don't show actions if AI processing is not complete
   if (statusAI !== "completed") {
     return <span className="text-muted-foreground text-xs">—</span>;
@@ -166,6 +175,10 @@ function InterviewStatusActions({
 
   const handleProceedToInterview = () => {
     proceedToInterview.mutate({ applicantId });
+  };
+
+  const handleReProcess = () => {
+    reProcess.mutate({ applicantId });
   };
 
   const handleHire = () => {
@@ -212,6 +225,9 @@ function InterviewStatusActions({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={handleReProcess}>
+          Re-Process Applicant
+        </DropdownMenuItem>
         {/* Show proceed to interview if not at last stage */}
         {!isLastInterview && (
           <DropdownMenuItem onClick={handleProceedToInterview}>
