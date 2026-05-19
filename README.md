@@ -1,3 +1,5 @@
+# ! IMPORTANT !
+# MIGRATED AND MERGED INTO https://github.com/JethroNatividad/CVRankify_Monorepo
 # CVRankify Web
 
 A modern web application for ranking and managing CVs/resumes, built with T3 Stack - Next.js, tRPC, Prisma, and NextAuth.
